@@ -44,7 +44,7 @@ class OrderService {
         OrderEmitter.sendMessageAndAwait(OrderCreatedEvent(Order))
     }
 
-    fun updateOrder(order: Order) : Boolean {
+    fun updateOrder(order: Order): Boolean {
         val entity = OrderRepository.findById(order.id) ?: return false
 
         entity.apply {

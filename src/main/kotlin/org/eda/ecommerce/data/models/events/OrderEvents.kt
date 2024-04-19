@@ -11,6 +11,7 @@ open class OrderEvent(operation: String, Order: Order) : Message<Order> {
 
     override fun getPayload(): Order = message.payload
     override fun getMetadata(): Metadata = message.metadata
+
     companion object {
         private fun createMessageWithMetadata(Order: Order, operation: String): Message<Order> {
             val metadata = Metadata.of(

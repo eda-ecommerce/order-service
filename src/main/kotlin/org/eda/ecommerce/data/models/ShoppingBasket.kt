@@ -1,29 +1,26 @@
 package org.eda.ecommerce.data.models
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
-import io.quarkus.hibernate.orm.panache.PanacheEntity_
 import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
-import sun.jvm.hotspot.oops.CellTypeState.value
-import java.util.UUID
+import java.util.*
 
 @Entity
 class ShoppingBasket : PanacheEntityBase() {
     @Id
-    lateinit var id: UUID
+    lateinit var shoppingBasketId: UUID
 
     lateinit var customerId: UUID
     lateinit var totalPrice: Number
     lateinit var totalItemQuantity: Number
 
-    @OneToMany(mappedBy = "shoppingBasketId")
+    @OneToMany
     lateinit var items: MutableList<ShoppingBasketItem>
 
     override fun toString(): String {
-        return "ShoppingBasket(id=$id, customerId=$customerId, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity, items=$items)"
+        return "ShoppingBasket(id=$shoppingBasketId, customerId=$customerId, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity, items=$items)"
     }
 }
 

@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.eclipse.microprofile.reactive.messaging.Incoming
 import org.eda.ecommerce.data.models.ShoppingBasket
-import sun.jvm.hotspot.oops.CellTypeState.value
 
 @ApplicationScoped
 class ShoppingBasketConsumer {

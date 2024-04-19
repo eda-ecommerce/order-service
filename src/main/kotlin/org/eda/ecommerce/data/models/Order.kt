@@ -2,15 +2,11 @@ package org.eda.ecommerce.data.models
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
-import io.quarkus.hibernate.orm.panache.PanacheEntity_
 import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
-import sun.jvm.hotspot.oops.CellTypeState.value
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 @Entity
 class Order : PanacheEntityBase() {
