@@ -1,0 +1,43 @@
+"%prod":
+  kafka:
+    bootstrap:
+      servers: "kafka:9092"
+
+"%test":
+  quarkus:
+    hibernate-orm:
+      database:
+        generation: "drop-and-create"
+    datasource:
+      db-kind: "sqlite"
+      username: "template"
+      password: "secret"
+      jdbc:
+        url: "jdbc:sqlite:test.db"
+
+quarkus:
+  swagger-ui:
+    always-include: true
+  hibernate-orm:
+    database:
+      generation: "update"
+  datasource:
+    db-kind: "sqlite"
+    username: "template"
+    password: "secret"
+    jdbc:
+      url: "jdbc:sqlite:database.db"
+
+kafka:
+  auto:
+    offset:
+      reset: "earliest"
+
+mp:
+  messaging:
+    outgoing:
+      test-entity-out:
+        topic: "test-entity"
+    incoming:
+      test-entity-in:
+        topic: "test-entity"
