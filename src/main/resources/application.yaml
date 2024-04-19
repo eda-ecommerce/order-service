@@ -36,8 +36,8 @@ kafka:
 mp:
   messaging:
     outgoing:
-      test-entity-out:
-        topic: "test-entity"
+      shopping-basket-out:
+        topic: "shoppingBasket"
     incoming:
-      test-entity-in:
-        topic: "test-entity"
+      shopping-basket-in:
+        topic: "shoppingBasket"
