@@ -17,7 +17,7 @@ class Order : PanacheEntityBase() {
     lateinit var orderStatus: OrderStatus
     lateinit var totalPrice: Number
 
-    @OneToMany
+    @ElementCollection
     lateinit var items: MutableList<ShoppingBasketItem>
 
     override fun toString(): String {

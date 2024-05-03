@@ -2,6 +2,7 @@ package org.eda.ecommerce.data.models
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
+import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
@@ -16,7 +17,7 @@ class ShoppingBasket : PanacheEntityBase() {
     lateinit var totalPrice: Number
     lateinit var totalItemQuantity: Number
 
-    @OneToMany
+    @ElementCollection
     lateinit var items: MutableList<ShoppingBasketItem>
 
     override fun toString(): String {
