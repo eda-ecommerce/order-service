@@ -9,12 +9,12 @@ import java.util.*
 @ApplicationScoped
 class OrderRepository : PanacheRepositoryBase<Order, UUID> {
     @ActivateRequestContext
-    fun countWithRequestContext() : Long {
+    fun countWithRequestContext(): Long {
         return count()
     }
 
     @ActivateRequestContext
-    fun getFirstWithRequestContext() : Order {
+    fun getFirstWithRequestContext(): Order {
         return listAll().first()
     }
 

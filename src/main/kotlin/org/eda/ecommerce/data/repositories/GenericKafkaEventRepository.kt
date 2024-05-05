@@ -5,7 +5,8 @@ import org.eda.ecommerce.data.events.external.incoming.StorableKafkaEvent
 import java.util.*
 import kotlin.reflect.KClass
 
-open class GenericKafkaEventRepository<T, ET: StorableKafkaEvent<T>>(private val eventClass: KClass<ET>) : PanacheRepositoryBase<StorableKafkaEvent<T>, UUID> {
+open class GenericKafkaEventRepository<T, ET : StorableKafkaEvent<T>>(private val eventClass: KClass<ET>) :
+    PanacheRepositoryBase<StorableKafkaEvent<T>, UUID> {
 
     fun createAndStoreEvent(operation: String, source: String, timestamp: String, payload: T): ET {
         val event = eventClass.java.getDeclaredConstructor().newInstance()

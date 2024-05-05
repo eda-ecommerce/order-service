@@ -8,7 +8,7 @@ import org.eda.ecommerce.JsonSerdeFactory
 import java.util.*
 
 class KafkaTestHelper {
-    companion object    {
+    companion object {
 
         fun clearTopicIfNotEmpty(companion: KafkaCompanion, topic: String) {
             companion.topics().delete(topic)
@@ -20,13 +20,12 @@ class KafkaTestHelper {
             consumer.close()
         }
 
-        inline fun <reified T> setupConsumer (kafkaConfig: Map<String, Any>): KafkaConsumer<String, T> {
+        inline fun <reified T> setupConsumer(kafkaConfig: Map<String, Any>): KafkaConsumer<String, T> {
             val consumerProperties = Properties()
             consumerProperties.putAll(kafkaConfig)
             consumerProperties[ConsumerConfig.GROUP_ID_CONFIG] = "test-group-id"
             consumerProperties[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = "true"
             consumerProperties[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
-
 
 
             val offeringEventJsonSerdeFactory = JsonSerdeFactory<T>()

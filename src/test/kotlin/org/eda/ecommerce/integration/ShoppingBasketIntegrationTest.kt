@@ -12,7 +12,10 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
 import org.eda.ecommerce.data.models.OrderStatus
 import org.eda.ecommerce.data.repositories.OrderRepository
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.*
 import java.util.concurrent.TimeUnit
 

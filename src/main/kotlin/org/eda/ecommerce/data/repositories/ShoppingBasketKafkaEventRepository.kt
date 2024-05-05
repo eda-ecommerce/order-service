@@ -5,4 +5,5 @@ import org.eda.ecommerce.data.events.external.incoming.ShoppingBasketEvent
 import org.eda.ecommerce.data.models.ShoppingBasket
 
 @ApplicationScoped
-class ShoppingBasketKafkaEventRepository : GenericKafkaEventRepository<ShoppingBasket, ShoppingBasketEvent>(ShoppingBasketEvent::class)
+class ShoppingBasketKafkaEventRepository :
+    GenericKafkaEventRepository<ShoppingBasket, ShoppingBasketEvent>(ShoppingBasketEvent::class)

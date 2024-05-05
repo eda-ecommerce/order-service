@@ -52,7 +52,7 @@ class PaymentIntegrationTest {
     }
 
     @Transactional
-    fun createOrder () {
+    fun createOrder() {
         val order = Order().apply {
             id = orderId
         }

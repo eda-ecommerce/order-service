@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import java.util.*
 
-abstract class StorableKafkaEvent<T> : PanacheEntityBase(){
+abstract class StorableKafkaEvent<T> : PanacheEntityBase() {
     open lateinit var id: UUID
 
     lateinit var source: EventSource
@@ -26,7 +26,8 @@ abstract class StorableKafkaEvent<T> : PanacheEntityBase(){
         PAYMENT("payment");
 
         companion object {
-            fun from(search: String): EventSource = requireNotNull(entries.find { it.value == search }) { "No EventSource with value $search" }
+            fun from(search: String): EventSource =
+                requireNotNull(entries.find { it.value == search }) { "No EventSource with value $search" }
         }
     }
 }

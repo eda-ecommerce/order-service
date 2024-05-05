@@ -1,7 +1,7 @@
 package org.eda.ecommerce.data.models
 
 import com.fasterxml.jackson.annotation.JsonValue
-import jakarta.persistence.*
+import jakarta.persistence.Embeddable
 import java.util.*
 
 @Embeddable

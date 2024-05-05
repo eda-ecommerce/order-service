@@ -20,7 +20,10 @@ class EventHandler {
     @Inject
     private lateinit var eventBus: EventBus
 
-    fun <T, ET : StorableKafkaEvent<T>> storeAndProcessEvent(rawRecord: ConsumerRecord<String, T>, topicRepository: GenericKafkaEventRepository<T, ET>) {
+    fun <T, ET : StorableKafkaEvent<T>> storeAndProcessEvent(
+        rawRecord: ConsumerRecord<String, T>,
+        topicRepository: GenericKafkaEventRepository<T, ET>
+    ) {
         val event = storeEvent(rawRecord, topicRepository)
 
         println("Stored event: $event")
@@ -41,7 +44,10 @@ class EventHandler {
      * This is done in its own transaction to ensure that the event is stored before processing.
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    fun <T, ET : StorableKafkaEvent<T>> storeEvent(rawRecord: ConsumerRecord<String, T>, topicRepository: GenericKafkaEventRepository<T, ET>): ET {
+    fun <T, ET : StorableKafkaEvent<T>> storeEvent(
+        rawRecord: ConsumerRecord<String, T>,
+        topicRepository: GenericKafkaEventRepository<T, ET>
+    ): ET {
         println("Storing event with transaction")
         return topicRepository.createAndStoreEvent(
             operation = String(rawRecord.headers().lastHeader("operation").value()),
@@ -56,7 +62,7 @@ class EventHandler {
      * This processes the event by dispatching it to the internal event bus.
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    fun <T, ET: StorableKafkaEvent<T>> processEvent(event: ET) {
+    fun <T, ET : StorableKafkaEvent<T>> processEvent(event: ET) {
         println("Processing event: $event")
 
         // TODO: Parse/breakdown the external events into smaller, more meaningful internal events
@@ -65,6 +71,7 @@ class EventHandler {
             StorableKafkaEvent.EventSource.SHOPPING_BASKET -> {
                 eventBus.publish("shopping-basket-checkout", event)
             }
+
             StorableKafkaEvent.EventSource.PAYMENT -> {
                 eventBus.publish("payment-updated", event)
             }
@@ -81,7 +88,10 @@ class EventHandler {
      * Sets the flag on the event to processed and persists it.
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    fun <T, ET : StorableKafkaEvent<T>> persistEventWorkSuccess(event: ET, topicRepository: GenericKafkaEventRepository<T, ET>) {
+    fun <T, ET : StorableKafkaEvent<T>> persistEventWorkSuccess(
+        event: ET,
+        topicRepository: GenericKafkaEventRepository<T, ET>
+    ) {
         event.finalize()
         topicRepository.merge(event)
     }
