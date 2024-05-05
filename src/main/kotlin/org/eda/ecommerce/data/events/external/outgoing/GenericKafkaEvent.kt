@@ -17,7 +17,7 @@ open class GenericKafkaEvent<T>(operation: String, value: T) : Message<T> {
                 OutgoingKafkaRecordMetadata.builder<String>()
                     .withHeaders(RecordHeaders().apply {
                         add("operation", operation.toByteArray())
-                        add("source", "Order".toByteArray())
+                        add("source", "order".toByteArray())
                         add("timestamp", System.currentTimeMillis().toString().toByteArray())
                     }).build()
             )
