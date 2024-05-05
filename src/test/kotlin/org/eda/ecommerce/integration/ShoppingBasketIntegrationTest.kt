@@ -1,8 +1,6 @@
 package org.eda.ecommerce.integration
 
-import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
-import io.quarkus.test.kafka.KafkaCompanionResource
 import io.smallrye.common.annotation.Identifier
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
@@ -20,8 +18,6 @@ import java.util.concurrent.TimeUnit
 
 
 @QuarkusTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@QuarkusTestResource(KafkaCompanionResource::class)
 class ShoppingBasketIntegrationTest {
 
     @Inject
@@ -36,14 +32,14 @@ class ShoppingBasketIntegrationTest {
     val customerId: UUID = UUID.randomUUID()
 
     @BeforeEach
-    fun setupKafkaHelpers() {
-        shoppingBasketProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
-    }
-
-    @BeforeEach
     @Transactional
     fun cleanRepositoryAndKafkaTopics() {
         orderRepository.deleteAll()
+    }
+
+    @BeforeEach
+    fun setupKafkaHelpers() {
+        shoppingBasketProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
     }
 
     @AfterEach

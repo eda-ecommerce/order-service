@@ -13,11 +13,23 @@
       username: "template"
       password: "secret"
       jdbc:
-        url: "jdbc:sqlite:test.db"
+        url: "jdbc:sqlite:databases/test.db"
+    kafka:
+      devservices:
+        port: 32801
 
 quarkus:
+  test-port: 0
   swagger-ui:
     always-include: true
+  kafka:
+    devservices:
+      image-name: "redpandadata/redpanda:v23.2.18"
+      port: 32800
+      topic-partitions:
+        order: 1
+        shopping-basket: 1
+        payment: 1
   hibernate-orm:
     database:
       generation: "update"
@@ -26,7 +38,7 @@ quarkus:
     username: "template"
     password: "secret"
     jdbc:
-      url: "jdbc:sqlite:database.db"
+      url: "jdbc:sqlite:databases/database.db"
 
 kafka:
   auto:
