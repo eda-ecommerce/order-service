@@ -15,38 +15,38 @@ import java.util.*
 class OrderService {
 
     @Inject
-    private lateinit var OrderRepository: OrderRepository
+    private lateinit var orderRepository: OrderRepository
 
     @Inject
     @Channel("test-entity-out")
-    private lateinit var OrderEmitter: MutinyEmitter<Order>
+    private lateinit var orderEmitter: MutinyEmitter<Order>
 
     fun getAll(): List<Order> {
-        return OrderRepository.listAll()
+        return orderRepository.listAll()
     }
 
     fun findById(id: UUID): Order {
-        return OrderRepository.findById(id)
+        return orderRepository.findById(id)
     }
 
     fun deleteById(id: UUID): Boolean {
-        val orderToDelete = OrderRepository.findById(id) ?: return false
+        val orderToDelete = orderRepository.findById(id) ?: return false
 
-        OrderRepository.delete(orderToDelete)
+        orderRepository.delete(orderToDelete)
 
-        OrderEmitter.sendMessageAndAwait(OrderDeletedKafkaEvent(orderToDelete))
+        orderEmitter.sendMessageAndAwait(OrderDeletedKafkaEvent(orderToDelete))
 
         return true
     }
 
     fun createNewEntity(Order: Order) {
-        OrderRepository.persist(Order)
+        orderRepository.persist(Order)
 
-        OrderEmitter.sendMessageAndAwait(OrderCreatedKafkaEvent(Order))
+        orderEmitter.sendMessageAndAwait(OrderCreatedKafkaEvent(Order))
     }
 
     fun updateOrder(order: Order): Boolean {
-        val entity = OrderRepository.findById(order.id) ?: return false
+        val entity = orderRepository.findById(order.id) ?: return false
 
         entity.apply {
             customerId = order.customerId
@@ -56,10 +56,10 @@ class OrderService {
             items = order.items
         }
 
-        OrderRepository.persist(entity)
+        orderRepository.persist(entity)
 
 
-        OrderEmitter.sendMessageAndAwait(OrderUpdatedKafkaEvent(entity))
+        orderEmitter.sendMessageAndAwait(OrderUpdatedKafkaEvent(entity))
 
         return true
     }
