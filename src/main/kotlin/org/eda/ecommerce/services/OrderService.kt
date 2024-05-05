@@ -21,7 +21,7 @@ class OrderService {
     private lateinit var orderRepository: OrderRepository
 
     @Inject
-    @Channel("test-entity-out")
+    @Channel("order-out")
     private lateinit var orderEmitter: MutinyEmitter<Order>
 
     fun getAll(): List<Order> {

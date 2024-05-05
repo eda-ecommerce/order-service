@@ -47,9 +47,9 @@ kafka:
 
 mp:
   messaging:
-    #    outgoing:
-    #      shopping-basket-out:
-    #        topic: "shoppingBasket"
+    outgoing:
+      order-out:
+        topic: "order"
     incoming:
       shopping-basket-in:
         topic: "shoppingBasket"
