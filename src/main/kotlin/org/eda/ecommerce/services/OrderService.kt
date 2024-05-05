@@ -5,8 +5,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.eclipse.microprofile.reactive.messaging.Channel
 import org.eda.ecommerce.data.models.Order
-import org.eda.ecommerce.data.models.events.OrderCreatedEvent
-import org.eda.ecommerce.data.models.events.OrderUpdatedEvent
+import org.eda.ecommerce.data.events.external.OrderCreatedKafkaEvent
+import org.eda.ecommerce.data.events.external.OrderUpdatedKafkaEvent
+import org.eda.ecommerce.data.events.external.OrderDeletedKafkaEvent
 import org.eda.ecommerce.data.repositories.OrderRepository
 import java.util.*
 
@@ -33,7 +34,7 @@ class OrderService {
 
         OrderRepository.delete(orderToDelete)
 
-        OrderEmitter.sendMessageAndAwait(OrderUpdatedEvent(orderToDelete))
+        OrderEmitter.sendMessageAndAwait(OrderDeletedKafkaEvent(orderToDelete))
 
         return true
     }
@@ -41,7 +42,7 @@ class OrderService {
     fun createNewEntity(Order: Order) {
         OrderRepository.persist(Order)
 
-        OrderEmitter.sendMessageAndAwait(OrderCreatedEvent(Order))
+        OrderEmitter.sendMessageAndAwait(OrderCreatedKafkaEvent(Order))
     }
 
     fun updateOrder(order: Order): Boolean {
@@ -58,7 +59,7 @@ class OrderService {
         OrderRepository.persist(entity)
 
 
-        OrderEmitter.sendMessageAndAwait(OrderUpdatedEvent(entity))
+        OrderEmitter.sendMessageAndAwait(OrderUpdatedKafkaEvent(entity))
 
         return true
     }

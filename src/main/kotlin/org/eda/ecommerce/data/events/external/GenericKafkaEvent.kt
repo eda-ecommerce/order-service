@@ -1,19 +1,18 @@
-package org.eda.ecommerce.data.models.events
+package org.eda.ecommerce.data.events.external
 
 import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata
 import org.apache.kafka.common.header.internals.RecordHeaders
 import org.eclipse.microprofile.reactive.messaging.Message
 import org.eclipse.microprofile.reactive.messaging.Metadata
-import org.eda.ecommerce.data.models.Order
 
-open class OrderEvent(operation: String, Order: Order) : Message<Order> {
-    private val message: Message<Order> = createMessageWithMetadata(Order, operation)
+open class GenericKafkaEvent<T>(operation: String, value: T) : Message<T> {
+    private val message: Message<T> = createMessageWithMetadata(value, operation)
 
-    override fun getPayload(): Order = message.payload
+    override fun getPayload(): T = message.payload
     override fun getMetadata(): Metadata = message.metadata
 
     companion object {
-        private fun createMessageWithMetadata(Order: Order, operation: String): Message<Order> {
+        private fun <T> createMessageWithMetadata(value: T, operation: String): Message<T> {
             val metadata = Metadata.of(
                 OutgoingKafkaRecordMetadata.builder<String>()
                     .withHeaders(RecordHeaders().apply {
@@ -22,13 +21,13 @@ open class OrderEvent(operation: String, Order: Order) : Message<Order> {
                         add("timestamp", System.currentTimeMillis().toString().toByteArray())
                     }).build()
             )
-            return Message.of(Order, metadata)
+            return Message.of(value, metadata)
         }
     }
 }
 
-class OrderCreatedEvent(order: Order) : OrderEvent("created", order)
+open class GenericKafkaCreatedEvent<T>(value: T) : GenericKafkaEvent<T>("created", value)
 
-class OrderUpdatedEvent(order: Order) : OrderEvent("updated", order)
+open class GenericKafkaUpdatedEvent<T>(value: T) : GenericKafkaEvent<T>("updated", value)
 
-class OrderDeletedEvent(order: Order) : OrderEvent("deleted", order)
+open class GenericKafkaDeletedEvent<T>(value: T) : GenericKafkaEvent<T>("deleted", value)
