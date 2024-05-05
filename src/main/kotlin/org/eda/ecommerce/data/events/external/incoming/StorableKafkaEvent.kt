@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonValue
 import io.quarkus.hibernate.orm.panache.PanacheEntity
 
 abstract class StorableKafkaEvent<T> : PanacheEntity(){
-    lateinit var operation: String
     lateinit var source: EventSource
+    lateinit var operation: String
     lateinit var timestamp: String
     var payload: T? = null
     var processed: Boolean = false
@@ -15,7 +15,7 @@ abstract class StorableKafkaEvent<T> : PanacheEntity(){
     }
 
     override fun toString(): String {
-        return "StorableKafkaEvent(id=$id, operation=$operation, source=$source, timestamp=$timestamp, processed=$processed, payload=$payload)"
+        return "StorableKafkaEvent(id=$id, source=$source, operation=$operation, timestamp=$timestamp, processed=$processed, payload=$payload)"
     }
 
     enum class EventSource(@JsonValue val value: String) {
