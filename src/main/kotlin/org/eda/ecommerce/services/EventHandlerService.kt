@@ -32,6 +32,8 @@ class EventHandlerService {
     /**
      * This creates an event of the given type ET and saves it to the database.
      * ET is the same type the repository stores and something that extends StorableKafkaEvent.
+     *
+     * This is done in its own transaction to ensure that the event is stored before processing.
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     fun <T, ET : StorableKafkaEvent<T>> storeEvent(rawRecord: ConsumerRecord<String, T>, topicRepository: GenericKafkaEventRepository<T, ET>): ET {
