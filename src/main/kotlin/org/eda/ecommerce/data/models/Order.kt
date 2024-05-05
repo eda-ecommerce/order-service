@@ -6,7 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
 import jakarta.persistence.*
 import java.util.*
 
-@Entity
+@Entity(name = "Orders")
 class Order : PanacheEntityBase() {
     @Id
     lateinit var id: UUID
