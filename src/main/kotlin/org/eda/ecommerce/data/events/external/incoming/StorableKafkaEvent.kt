@@ -3,7 +3,7 @@ package org.eda.ecommerce.data.events.external.incoming
 import com.fasterxml.jackson.annotation.JsonValue
 import io.quarkus.hibernate.orm.panache.PanacheEntity
 
-open class StorableKafkaEvent<T> : PanacheEntity(){
+abstract class StorableKafkaEvent<T> : PanacheEntity(){
     lateinit var operation: String
     lateinit var source: EventSource
     lateinit var timestamp: String
