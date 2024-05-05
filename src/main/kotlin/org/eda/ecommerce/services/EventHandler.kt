@@ -9,27 +9,27 @@ import org.eda.ecommerce.data.events.external.incoming.StorableKafkaEvent
 import org.eda.ecommerce.data.repositories.GenericKafkaEventRepository
 
 /**
- * This service will take in the external events, store them and process/split them into internal event bus events.
- * After dispatching the internal events, it will wait for all of them to complete until marking the external event as processed.
+ * This service will take in the external events, store them and process/split them into internal events.
+ * After dispatching the internal events into the event bus, it will wait for all of them to complete until marking the external event as processed.
  *
  * It also contains startup logic that looks at any unprocessed events and processes them in the same manner.
  */
 @ApplicationScoped
-class EventHandlerService {
+class EventHandler {
 
     @Inject
     private lateinit var eventBus: EventBus
 
     fun <T, ET : StorableKafkaEvent<T>> storeAndProcessEvent(rawRecord: ConsumerRecord<String, T>, topicRepository: GenericKafkaEventRepository<T, ET>) {
-        val event = storeEvent<T, ET>(rawRecord, topicRepository)
+        val event = storeEvent(rawRecord, topicRepository)
 
         println("Stored event: $event")
 
-        processEvent<T, ET>(event)
+        processEvent(event)
 
         println("Event processed: $event")
 
-        persistEventWorkSuccess<T, ET>(event, topicRepository)
+        persistEventWorkSuccess(event, topicRepository)
 
         println("Event persisted: $event")
     }

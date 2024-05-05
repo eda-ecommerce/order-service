@@ -6,7 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.eclipse.microprofile.reactive.messaging.Incoming
 import org.eda.ecommerce.data.models.ShoppingBasket
 import org.eda.ecommerce.data.repositories.ShoppingBasketKafkaEventRepository
-import org.eda.ecommerce.services.EventHandlerService
+import org.eda.ecommerce.services.EventHandler
 
 @ApplicationScoped
 class ShoppingBasketConsumer {
@@ -15,7 +15,7 @@ class ShoppingBasketConsumer {
     private lateinit var shoppingBasketKafkaEventRepository: ShoppingBasketKafkaEventRepository
 
     @Inject
-    private lateinit var eventHandlerService: EventHandlerService
+    private lateinit var eventHandler: EventHandler
 
     @Incoming("shopping-basket-in")
     fun consume(record: ConsumerRecord<String, ShoppingBasket>) {
@@ -23,6 +23,6 @@ class ShoppingBasketConsumer {
         println("Received Shopping Basket event with operation: ${String(operation.value())}")
         println(record.value())
 
-        eventHandlerService.storeAndProcessEvent(record, shoppingBasketKafkaEventRepository)
+        eventHandler.storeAndProcessEvent(record, shoppingBasketKafkaEventRepository)
     }
 }
