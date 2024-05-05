@@ -8,9 +8,9 @@ import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
 import org.eda.ecommerce.data.events.external.incoming.StorableKafkaEvent
-import org.eda.ecommerce.data.events.external.outgoing.OrderCreatedKafkaEvent
-import org.eda.ecommerce.data.events.external.outgoing.OrderDeletedKafkaEvent
-import org.eda.ecommerce.data.events.external.outgoing.OrderUpdatedKafkaEvent
+import org.eda.ecommerce.data.events.external.outgoing.OrderCreatedKafkaMessage
+import org.eda.ecommerce.data.events.external.outgoing.OrderDeletedKafkaMessage
+import org.eda.ecommerce.data.events.external.outgoing.OrderUpdatedKafkaMessage
 import org.eda.ecommerce.data.models.Order
 import org.eda.ecommerce.data.models.OrderStatus
 import org.eda.ecommerce.data.models.ShoppingBasket
@@ -41,7 +41,7 @@ class OrderService {
 
         orderRepository.delete(orderToDelete)
 
-        orderEmitter.sendMessageAndAwait(OrderDeletedKafkaEvent(orderToDelete))
+        orderEmitter.sendMessageAndAwait(OrderDeletedKafkaMessage(orderToDelete))
 
         return true
     }
@@ -69,7 +69,7 @@ class OrderService {
     fun persistAndSendEvent(order: Order) {
         orderRepository.persist(order)
 
-        orderEmitter.sendMessageAndAwait(OrderCreatedKafkaEvent(order))
+        orderEmitter.sendMessageAndAwait(OrderCreatedKafkaMessage(order))
     }
 
     @Transactional
@@ -87,7 +87,7 @@ class OrderService {
         orderRepository.persist(entity)
 
 
-        orderEmitter.sendMessageAndAwait(OrderUpdatedKafkaEvent(entity))
+        orderEmitter.sendMessageAndAwait(OrderUpdatedKafkaMessage(entity))
 
         return true
     }
