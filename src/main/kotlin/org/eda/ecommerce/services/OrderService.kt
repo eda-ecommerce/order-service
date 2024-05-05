@@ -5,9 +5,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.eclipse.microprofile.reactive.messaging.Channel
 import org.eda.ecommerce.data.models.Order
-import org.eda.ecommerce.data.events.external.OrderCreatedKafkaEvent
-import org.eda.ecommerce.data.events.external.OrderUpdatedKafkaEvent
-import org.eda.ecommerce.data.events.external.OrderDeletedKafkaEvent
+import org.eda.ecommerce.data.events.external.outgoing.OrderCreatedKafkaEvent
+import org.eda.ecommerce.data.events.external.outgoing.OrderUpdatedKafkaEvent
+import org.eda.ecommerce.data.events.external.outgoing.OrderDeletedKafkaEvent
 import org.eda.ecommerce.data.repositories.OrderRepository
 import java.util.*
 

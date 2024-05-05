@@ -1,4 +1,4 @@
-package org.eda.ecommerce.data.events.external
+package org.eda.ecommerce.data.events.external.outgoing
 
 import org.eda.ecommerce.data.models.Order
 

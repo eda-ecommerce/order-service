@@ -1,4 +1,4 @@
-package org.eda.ecommerce.data.events.external
+package org.eda.ecommerce.data.events.external.outgoing
 
 import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata
 import org.apache.kafka.common.header.internals.RecordHeaders
