@@ -69,19 +69,21 @@ class EventHandler {
         // TODO: Figure out if this is the right place for it.
         when (event.source) {
             StorableKafkaEvent.EventSource.SHOPPING_BASKET -> {
-                eventBus.publish("shopping-basket-checkout", event)
+                when (event.operation) {
+                    StorableKafkaEvent.EventOperation.CHECKOUT -> {
+                        eventBus.publish("shopping-basket-checkout", event)
+                    }
+                    StorableKafkaEvent.EventOperation.CREATED -> TODO()
+                    StorableKafkaEvent.EventOperation.UPDATED -> TODO()
+                }
             }
-
-            StorableKafkaEvent.EventSource.PAYMENT -> {
-                eventBus.publish("payment-updated", event)
-            }
+            StorableKafkaEvent.EventSource.PAYMENT -> TODO()
         }
 
         // TODO: Check if this is actually finished at this point...
         //       It probably isn't and we need to do some magic to find out if everything finished.
         //       I did not figure anything out for a few hours, so it might be futile...
         //       But if we can force each listener to have a transaction on its own, this might not be a problem.
-        println("Internal event dispatched: $event")
     }
 
     /**

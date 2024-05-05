@@ -6,16 +6,21 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
+import org.apache.kafka.clients.consumer.ConsumerRecords
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
+import org.eda.ecommerce.data.models.Order
 import org.eda.ecommerce.data.models.OrderStatus
 import org.eda.ecommerce.data.repositories.OrderRepository
+import org.eda.ecommerce.helpers.KafkaTestHelper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -28,6 +33,7 @@ class ShoppingBasketIntegrationTest {
     lateinit var kafkaConfig: Map<String, Any>
 
     lateinit var shoppingBasketProducer: KafkaProducer<String, String>
+    lateinit var consumer: KafkaConsumer<String, Order>
 
     @Inject
     lateinit var orderRepository: OrderRepository
@@ -43,15 +49,19 @@ class ShoppingBasketIntegrationTest {
     @BeforeEach
     fun setupKafkaHelpers() {
         shoppingBasketProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
+        consumer = KafkaTestHelper.setupConsumer<Order>(kafkaConfig)
     }
 
     @AfterEach
     fun tearDown() {
         shoppingBasketProducer.close()
+        KafkaTestHelper.deleteConsumer(consumer)
     }
 
     @Test
-    fun createOrderOnBasketSubmit() {
+    fun createOrderOnBasketSubmitAndExpectEvent() {
+        consumer.subscribe(listOf("order"))
+
         val basketId = UUID.randomUUID()
 
         val shoppingBasketItemOne: JsonObject = JsonObject()
@@ -96,6 +106,19 @@ class ShoppingBasketIntegrationTest {
             Assertions.assertEquals(basketId, order.shoppingBasketId)
             Assertions.assertEquals(OrderStatus.InProcess, order.orderStatus)
         }
+
+        // And expect event to be thrown
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+
+        Assertions.assertEquals(1, records.count())
+
+        val event = records.records("order").iterator().asSequence().toList().first()
+        val eventHeaders = event.headers().toList().associateBy({ it.key() }, { it.value().toString(Charsets.UTF_8) })
+        val eventPayload = event.value()
+
+        Assertions.assertEquals("order", eventHeaders["source"])
+        Assertions.assertEquals("created", eventHeaders["operation"])
+        Assertions.assertEquals(OrderStatus.InProcess, eventPayload.orderStatus)
     }
 
 }
