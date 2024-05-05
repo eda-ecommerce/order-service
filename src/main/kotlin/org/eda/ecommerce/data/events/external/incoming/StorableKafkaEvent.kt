@@ -2,15 +2,29 @@ package org.eda.ecommerce.data.events.external.incoming
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
+import jakarta.persistence.Column
+import jakarta.persistence.Embedded
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.MappedSuperclass
+import org.hibernate.annotations.GenericGenerator
 import java.util.*
 
+@MappedSuperclass
 abstract class StorableKafkaEvent<T> : PanacheEntityBase() {
-    open lateinit var id: UUID
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    lateinit var id: UUID
 
     lateinit var source: EventSource
     lateinit var operation: String
     lateinit var timestamp: String
+
+    @Embedded
     var payload: T? = null
+
     var processed: Boolean = false
 
     fun finalize(status: Boolean = true) {

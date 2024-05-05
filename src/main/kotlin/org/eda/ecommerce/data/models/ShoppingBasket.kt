@@ -2,13 +2,12 @@ package org.eda.ecommerce.data.models
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.persistence.ElementCollection
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import jakarta.persistence.Embeddable
 import java.util.*
 
-@Entity
+@Embeddable
 class ShoppingBasket : PanacheEntityBase() {
-    @Id
+
     lateinit var shoppingBasketId: UUID
 
     lateinit var customerId: UUID
