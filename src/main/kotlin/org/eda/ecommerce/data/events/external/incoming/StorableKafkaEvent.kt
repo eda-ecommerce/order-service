@@ -16,16 +16,16 @@ abstract class StorableKafkaEvent<T> : PanacheEntityBase() {
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    lateinit var id: UUID
+    open lateinit var id: UUID
 
-    lateinit var source: EventSource
-    lateinit var operation: String
-    lateinit var timestamp: String
+    open lateinit var source: EventSource
+    open lateinit var operation: EventOperation
+    open lateinit var timestamp: String
 
     @Embedded
-    var payload: T? = null
+    open var payload: T? = null
 
-    var processed: Boolean = false
+    open var processed: Boolean = false
 
     fun finalize(status: Boolean = true) {
         this.processed = status
@@ -42,6 +42,17 @@ abstract class StorableKafkaEvent<T> : PanacheEntityBase() {
         companion object {
             fun from(search: String): EventSource =
                 requireNotNull(entries.find { it.value == search }) { "No EventSource with value $search" }
+        }
+    }
+
+    enum class EventOperation(@JsonValue val value: String) {
+        CREATED("CREATED"),
+        UPDATED("UPDATED"),
+        CHECKOUT("CHECKOUT");
+
+        companion object {
+            fun from(search: String): EventOperation =
+                requireNotNull(entries.find { it.value == search }) { "No EventOperation with value $search" }
         }
     }
 }

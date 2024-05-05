@@ -20,12 +20,13 @@ class Order : PanacheEntityBase() {
     lateinit var orderDate: String
     lateinit var orderStatus: OrderStatus
     lateinit var totalPrice: Number
+    lateinit var totalItemQuantity: Number
 
     @ElementCollection
     lateinit var items: MutableList<ShoppingBasketItem>
 
     override fun toString(): String {
-        return "ShoppingBasket(id=${id}, shoppingBasketId=$shoppingBasketId, customerId=$customerId, orderDate=$orderDate, orderStatus=$orderStatus, totalPrice=$totalPrice, items=$items)"
+        return "ShoppingBasket(id=${id}, shoppingBasketId=$shoppingBasketId, customerId=$customerId, orderDate=$orderDate, orderStatus=$orderStatus, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity items=$items)"
     }
 }
 

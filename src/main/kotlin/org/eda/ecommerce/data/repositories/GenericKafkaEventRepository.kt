@@ -10,7 +10,7 @@ open class GenericKafkaEventRepository<T, ET : StorableKafkaEvent<T>>(private va
 
     fun createAndStoreEvent(operation: String, source: String, timestamp: String, payload: T): ET {
         val event = eventClass.java.getDeclaredConstructor().newInstance()
-        event.operation = operation
+        event.operation = StorableKafkaEvent.EventOperation.from(operation)
         event.source = StorableKafkaEvent.EventSource.from(source)
         event.timestamp = timestamp
         event.payload = payload
