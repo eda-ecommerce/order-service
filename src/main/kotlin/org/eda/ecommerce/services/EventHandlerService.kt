@@ -1,6 +1,8 @@
 package org.eda.ecommerce.services
 
+import io.vertx.mutiny.core.eventbus.EventBus
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.eda.ecommerce.data.events.external.incoming.StorableKafkaEvent
@@ -15,16 +17,19 @@ import org.eda.ecommerce.data.repositories.GenericKafkaEventRepository
 @ApplicationScoped
 class EventHandlerService {
 
+    @Inject
+    private lateinit var eventBus: EventBus
+
     fun <T, ET : StorableKafkaEvent<T>> storeAndProcessEvent(rawRecord: ConsumerRecord<String, T>, topicRepository: GenericKafkaEventRepository<T, ET>) {
-        val event = storeEvent(rawRecord, topicRepository)
+        val event = storeEvent<T, ET>(rawRecord, topicRepository)
 
         println("Stored event: $event")
 
-        processEvent(event)
+        processEvent<T, ET>(event)
 
         println("Event processed: $event")
 
-        persistEventWorkSuccess(event, topicRepository)
+        persistEventWorkSuccess<T, ET>(event, topicRepository)
 
         println("Event persisted: $event")
     }
@@ -47,19 +52,38 @@ class EventHandlerService {
     }
 
 
-    fun <T> processEvent(event: StorableKafkaEvent<T>) {
+    /**
+     * This processes the event by dispatching it to the internal event bus.
+     */
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    fun <T, ET: StorableKafkaEvent<T>> processEvent(event: ET) {
         println("Processing event: $event")
 
-        // TODO: Dispatch the event to the internal event bus
-        // TODO: Wait for all internal events to complete
-        // TODO: Mark the external event as processed
+        // TODO: Parse/breakdown the external events into smaller, more meaningful internal events
+        // TODO: Figure out if this is the right place for it.
+        when (event.source) {
+            StorableKafkaEvent.EventSource.SHOPPING_BASKET -> {
+                eventBus.publish("shopping-basket-checkout", event)
+            }
+            StorableKafkaEvent.EventSource.PAYMENT -> {
+                eventBus.publish("payment-updated", event)
+            }
+        }
 
+        // TODO: Check if this is actually finished at this point...
+        //       It probably isn't and we need to do some magic to find out if everything finished.
+        //       I did not figure anything out for a few hours, so it might be futile...
+        //       But if we can force each listener to have a transaction on its own, this might not be a problem.
+        println("Internal event dispatched: $event")
     }
 
+    /**
+     * Sets the flag on the event to processed and persists it.
+     */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    fun <T, ET : StorableKafkaEvent<T>> persistEventWorkSuccess(event: StorableKafkaEvent<T>, topicRepository: GenericKafkaEventRepository<T, ET>) {
+    fun <T, ET : StorableKafkaEvent<T>> persistEventWorkSuccess(event: ET, topicRepository: GenericKafkaEventRepository<T, ET>) {
         event.finalize()
-        topicRepository.persist(event)
+        topicRepository.merge(event)
     }
 
     fun processUnprocessedEvents() {
