@@ -19,10 +19,10 @@ class ShoppingBasketItem {
     override fun toString(): String {
         return "ShoppingBasketItem(id=$shoppingBasketItemId, shoppingBasketId=$shoppingBasketId, offeringId=$offeringId, quantity=$quantity, totalPrice=$totalPrice, itemState=$itemState)"
     }
-}
 
+    enum class ItemState(@JsonValue val value: String) {
+        AVAILABLE("AVAILABLE"),
+        UNAVAILABLE("UNAVAILABLE");
+    }
 
-enum class ItemState(@JsonValue val value: String) {
-    AVAILABLE("AVAILABLE"),
-    UNAVAILABLE("UNAVAILABLE");
 }

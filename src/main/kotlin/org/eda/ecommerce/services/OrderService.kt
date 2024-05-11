@@ -12,7 +12,7 @@ import org.eda.ecommerce.data.events.external.outgoing.OrderCreatedKafkaMessage
 import org.eda.ecommerce.data.events.external.outgoing.OrderDeletedKafkaMessage
 import org.eda.ecommerce.data.events.external.outgoing.OrderUpdatedKafkaMessage
 import org.eda.ecommerce.data.models.Order
-import org.eda.ecommerce.data.models.OrderStatus
+import org.eda.ecommerce.data.models.Order.OrderStatus
 import org.eda.ecommerce.data.models.ShoppingBasket
 import org.eda.ecommerce.data.repositories.OrderRepository
 import java.util.*

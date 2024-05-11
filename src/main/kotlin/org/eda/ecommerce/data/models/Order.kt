@@ -28,11 +28,11 @@ class Order : PanacheEntityBase() {
     override fun toString(): String {
         return "ShoppingBasket(id=${id}, shoppingBasketId=$shoppingBasketId, customerId=$customerId, orderDate=$orderDate, orderStatus=$orderStatus, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity items=$items)"
     }
-}
 
-enum class OrderStatus(@JsonValue val value: String) {
-    InProcess("InProcess"),
-    Cancelled("Cancelled"),
-    Completed("Completed"),
-    Paid("Paid");
+    enum class OrderStatus(@JsonValue val value: String) {
+        InProcess("InProcess"),
+        Cancelled("Cancelled"),
+        Completed("Completed"),
+        Paid("Paid");
+    }
 }
