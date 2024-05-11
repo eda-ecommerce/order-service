@@ -20,6 +20,9 @@ class EventHandler {
     @Inject
     private lateinit var eventBus: EventBus
 
+    /**
+     * This will store the external event, process it by dispatching internal events and then mark it as processed.
+     */
     fun <T, ET : StorableKafkaEvent<T>> storeAndProcessEvent(
         rawRecord: ConsumerRecord<String, T>,
         topicRepository: GenericKafkaEventRepository<T, ET>
@@ -32,6 +35,9 @@ class EventHandler {
 
         println("Event processed: $event")
 
+        // TODO: This should really only happen if the event got processed successfully. But for the life of me, I can't figure out how to do that.
+        //  As soon as multiple listeners are involved, I cannot send this event and receive an answer of success from everyone.
+        //  This could ne a major problem once one listener fails or takes too long because the event would be marked as processed anyway.
         persistEventWorkSuccess(event, topicRepository)
 
         println("Event persisted: $event")
@@ -59,7 +65,7 @@ class EventHandler {
 
 
     /**
-     * This processes the event by dispatching it to the internal event bus.
+     * This processes the event by dispatching it (or multiple smaller ones) to the internal event bus.
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     fun <T, ET : StorableKafkaEvent<T>> processEvent(event: ET) {
