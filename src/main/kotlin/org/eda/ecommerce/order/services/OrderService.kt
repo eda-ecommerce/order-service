@@ -68,7 +68,7 @@ class OrderService {
 
         val order = Order().apply {
             customerId = shoppingBasket.customerId
-            orderDate = orderCreatedEvent.timestamp
+            orderDate = Date().toString()
             orderStatus = OrderStatus.InProcess
             totalPrice = shoppingBasket.totalPrice
             totalItemQuantity = shoppingBasket.totalItemQuantity
