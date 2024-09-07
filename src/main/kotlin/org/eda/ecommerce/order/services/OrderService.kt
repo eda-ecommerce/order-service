@@ -9,11 +9,13 @@ import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderCreatedKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderDeletedKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderUpdatedKafkaMessage
+import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.models.ProductQuantity
 import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.data.repositories.OrderRepository
+import org.eda.ecommerce.order.exceptions.OfferingNotActiveException
 import org.eda.ecommerce.order.exceptions.OfferingNotFoundException
 import java.util.*
 
@@ -60,6 +62,10 @@ class OrderService {
         val productQuantities = mutableListOf<ProductQuantity>()
         shoppingBasketItems.forEach { item ->
             val offering = offeringService.findById(item.offeringId) ?: throw OfferingNotFoundException(item.offeringId, "Cannot create order from shopping basket ${shoppingBasket.shoppingBasketId}")
+
+            if (offering.status != Offering.OfferingStatus.ACTIVE) {
+                throw OfferingNotActiveException(item.offeringId, "Cannot create order from shopping basket ${shoppingBasket.shoppingBasketId}")
+            }
 
             val totalQuantity = offering.quantity.times(item.quantity)
 

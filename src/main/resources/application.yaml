@@ -17,6 +17,13 @@
     kafka:
       devservices:
         port: 32801
+  mp:
+    messaging:
+      incoming:
+        shopping-basket-in:
+          failure-strategy: "ignore"
+        offering-in:
+          failure-strategy: "ignore"
 
 quarkus:
   swagger-ui:

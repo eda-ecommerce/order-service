@@ -21,7 +21,7 @@ import org.eda.ecommerce.helpers.KafkaTestHelper
 import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.repositories.OfferingRepository
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -55,6 +55,8 @@ class ShoppingBasketIntegrationTest {
     @Transactional
     fun cleanRepositoryAndKafkaTopics() {
         orderRepository.deleteAll()
+        offeringRepository.deleteAll()
+        KafkaTestHelper.clearTopicIfNotEmpty(companion,"order")
     }
 
     @BeforeEach
@@ -67,27 +69,42 @@ class ShoppingBasketIntegrationTest {
     fun tearDown() {
         shoppingBasketProducer.close()
         KafkaTestHelper.deleteConsumer(consumer)
-        KafkaTestHelper.clearTopicIfNotEmpty(companion,"order")
-
-        cleanupRepositories()
     }
 
     @Transactional
-    fun cleanupRepositories() {
-        orderRepository.deleteAll()
-        offeringRepository.deleteAll()
-    }
-
-    @Transactional
-    fun createOffering(pOfferingId: UUID, pProductId: UUID, pQuantity: Int) {
+    fun createOffering(pOfferingId: UUID? = null, pProductId: UUID? = null, pQuantity: Int = 1, pStatus: Offering.OfferingStatus = Offering.OfferingStatus.ACTIVE): Offering {
         val offering = Offering().apply {
-            id = pOfferingId
-            productId = pProductId
+            id = pOfferingId ?: UUID.randomUUID()
+            productId = pProductId ?: UUID.randomUUID()
             quantity = pQuantity
+            status = pStatus
         }
 
         offeringRepository.persist(offering)
+
+        println("Created offering: $offering")
+
+        return offering
     }
+
+    fun ensureOfferingIsUpdatable(pOffering: Offering) : Offering {
+        if (!offeringRepository.isPersistent(pOffering)) {
+            println("Offering to update is not persistent. Refreshing from repository with ID: ${pOffering.id}")
+            return offeringRepository.findById(pOffering.id)
+        }
+
+        return pOffering
+    }
+
+    @Transactional
+    fun updateOfferingStatus(pOffering: Offering, pStatus: Offering.OfferingStatus) {
+        val offering = ensureOfferingIsUpdatable(pOffering)
+
+        println("Updating status of offering $offering to $pStatus")
+
+        offering.status = pStatus
+    }
+
 
     @Test
     fun createOrderOnBasketSubmitAndExpectEvent() {
@@ -119,57 +136,56 @@ class ShoppingBasketIntegrationTest {
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
         shoppingBasketProducer
-            .send(productRecord)
-            .get()
+            ?.send(productRecord)
+            ?.get()
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted {
-            Assertions.assertEquals(1, orderRepository.countWithRequestContext())
+            assertEquals(1, orderRepository.countWithRequestContext())
 
             val order = orderRepository.getFirstWithRequestContext()
 
-            Assertions.assertEquals(basketId, order.shoppingBasketId)
-            Assertions.assertEquals(OrderStatus.InProcess, order.orderStatus)
-            Assertions.assertEquals(customerId, order.customerId)
-            Assertions.assertEquals(totalPrice, order.totalPrice)
-            Assertions.assertEquals(requestedOfferingCount, order.totalItemQuantity)
-            Assertions.assertEquals(1, order.items.size)
-            Assertions.assertEquals(1, order.products.size)
-            Assertions.assertEquals(productId, order.products.first().productId)
-            Assertions.assertEquals(expectedProductQuantity, order.products.first().quantity)
-            Assertions.assertEquals(UUID.fromString(shoppingBasketItemOne.getString("shoppingBasketItemId")), order.items.first().shoppingBasketItemId)
-            Assertions.assertEquals(UUID.fromString(shoppingBasketItemOne.getString("offeringId")), order.items.first().offeringId)
-            Assertions.assertEquals(shoppingBasketItemOne.getInteger("quantity"), order.items.first().quantity)
-            Assertions.assertEquals(shoppingBasketItemOne.getFloat("totalPrice"), order.items.first().totalPrice)
-            Assertions.assertEquals(ShoppingBasketItem.ItemState.AVAILABLE, order.items.first().itemState)
+            assertEquals(basketId, order.shoppingBasketId)
+            assertEquals(OrderStatus.InProcess, order.orderStatus)
+            assertEquals(customerId, order.customerId)
+            assertEquals(totalPrice, order.totalPrice)
+            assertEquals(requestedOfferingCount, order.totalItemQuantity)
+            assertEquals(1, order.items.size)
+            assertEquals(1, order.products.size)
+            assertEquals(productId, order.products.first().productId)
+            assertEquals(expectedProductQuantity, order.products.first().quantity)
+            assertEquals(UUID.fromString(shoppingBasketItemOne.getString("shoppingBasketItemId")), order.items.first().shoppingBasketItemId)
+            assertEquals(UUID.fromString(shoppingBasketItemOne.getString("offeringId")), order.items.first().offeringId)
+            assertEquals(shoppingBasketItemOne.getInteger("quantity"), order.items.first().quantity)
+            assertEquals(shoppingBasketItemOne.getFloat("totalPrice"), order.items.first().totalPrice)
+            assertEquals(ShoppingBasketItem.ItemState.AVAILABLE, order.items.first().itemState)
         }
 
         // And expect event to be thrown
         val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
 
-        Assertions.assertEquals(1, records.count())
+        assertEquals(1, records.count())
 
         val event = records.records("order").iterator().asSequence().toList().first()
         val eventHeaders = event.headers().toList().associateBy({ it.key() }, { it.value().toString(Charsets.UTF_8) })
         val eventPayload = event.value()
 
-        Assertions.assertEquals("order", eventHeaders["source"])
-        Assertions.assertEquals("created", eventHeaders["operation"])
-        Assertions.assertEquals(basketId.toString(), eventPayload.shoppingBasketId.toString())
-        Assertions.assertEquals(OrderStatus.InProcess, eventPayload.orderStatus)
-        Assertions.assertEquals(customerId.toString(), eventPayload.customerId.toString())
-        Assertions.assertEquals(totalPrice, eventPayload.totalPrice)
-        Assertions.assertEquals(requestedOfferingCount, eventPayload.totalItemQuantity)
-        Assertions.assertEquals(1, eventPayload.items.size)
-        Assertions.assertEquals(1, eventPayload.products.size)
-        Assertions.assertEquals(productId.toString(), eventPayload.products.first().productId.toString())
-        Assertions.assertEquals(expectedProductQuantity, eventPayload.products.first().quantity)
-        Assertions.assertEquals(shoppingBasketItemOne.getString("shoppingBasketItemId"), eventPayload.items.first().shoppingBasketItemId.toString())
-        Assertions.assertEquals(shoppingBasketItemOne.getString("offeringId"), eventPayload.items.first().offeringId.toString())
-        Assertions.assertEquals(shoppingBasketItemOne.getInteger("quantity"), eventPayload.items.first().quantity)
-        Assertions.assertEquals(shoppingBasketItemOne.getFloat("totalPrice"), eventPayload.items.first().totalPrice)
-        Assertions.assertEquals(ShoppingBasketItem.ItemState.AVAILABLE, eventPayload.items.first().itemState)
+        assertEquals("order", eventHeaders["source"])
+        assertEquals("created", eventHeaders["operation"])
+        assertEquals(basketId.toString(), eventPayload.shoppingBasketId.toString())
+        assertEquals(OrderStatus.InProcess, eventPayload.orderStatus)
+        assertEquals(customerId.toString(), eventPayload.customerId.toString())
+        assertEquals(totalPrice, eventPayload.totalPrice)
+        assertEquals(requestedOfferingCount, eventPayload.totalItemQuantity)
+        assertEquals(1, eventPayload.items.size)
+        assertEquals(1, eventPayload.products.size)
+        assertEquals(productId.toString(), eventPayload.products.first().productId.toString())
+        assertEquals(expectedProductQuantity, eventPayload.products.first().quantity)
+        assertEquals(shoppingBasketItemOne.getString("shoppingBasketItemId"), eventPayload.items.first().shoppingBasketItemId.toString())
+        assertEquals(shoppingBasketItemOne.getString("offeringId"), eventPayload.items.first().offeringId.toString())
+        assertEquals(shoppingBasketItemOne.getInteger("quantity"), eventPayload.items.first().quantity)
+        assertEquals(shoppingBasketItemOne.getFloat("totalPrice"), eventPayload.items.first().totalPrice)
+        assertEquals(ShoppingBasketItem.ItemState.AVAILABLE, eventPayload.items.first().itemState)
     }
-
 
     @Test
     fun dontAllowOrderCreationWhenBasketReferencesUnknownOffering() {
@@ -190,16 +206,92 @@ class ShoppingBasketIntegrationTest {
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
         shoppingBasketProducer
-            .send(productRecord)
-            .get()
+            ?.send(productRecord)
+            ?.get()
 
         // Expect the order NOT to be created
         await().atMost(10, TimeUnit.SECONDS).untilAsserted {
-            Assertions.assertEquals(0, orderRepository.countWithRequestContext())
+            assertEquals(0, orderRepository.countWithRequestContext())
         }
 
         // And expect no event to be thrown
         val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
-        Assertions.assertEquals(0, records.count())
+        assertEquals(0, records.count())
+    }
+
+    @Test
+    fun dontAllowOrderCreationWhenBasketReferencesRetiredOffering() {
+        consumer.subscribe(listOf("order"))
+
+        val offeringId = UUID.randomUUID()
+        val offering = createOffering(offeringId)
+
+        // Now retire the offering
+        updateOfferingStatus(offering, Offering.OfferingStatus.RETIRED)
+
+        val checkoutEventFactory = CheckoutEventFactory(customerId)
+        // Add a random Offering to our checkout event that does not exist in the OfferingRepository
+        checkoutEventFactory.addOffering(offeringId)
+        val (shoppingBasketEvent) = checkoutEventFactory.create()
+
+        val productRecord = ProducerRecord<String, String>(
+            "shoppingBasket",
+            shoppingBasketEvent.encode()
+        )
+        productRecord.headers()
+            .add("operation", "CHECKOUT".toByteArray())
+            .add("source", "shopping-basket-service".toByteArray())
+            .add("timestamp", System.currentTimeMillis().toString().toByteArray())
+
+        shoppingBasketProducer
+            ?.send(productRecord)
+            ?.get()
+
+        // Expect the order NOT to be created
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+            assertEquals(0, orderRepository.countWithRequestContext())
+        }
+
+        // And expect no event to be thrown
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        assertEquals(0, records.count())
+    }
+
+    @Test
+    fun dontAllowOrderCreationWhenBasketReferencesInactiveOffering() {
+        consumer.subscribe(listOf("order"))
+
+        val offeringId = UUID.randomUUID()
+        val offering = createOffering(offeringId)
+
+        // Now set the offering to inactive
+        updateOfferingStatus(offering, Offering.OfferingStatus.INACTIVE)
+
+        val checkoutEventFactory = CheckoutEventFactory(customerId)
+        // Add a random Offering to our checkout event that does not exist in the OfferingRepository
+        checkoutEventFactory.addOffering(offeringId)
+        val (shoppingBasketEvent) = checkoutEventFactory.create()
+
+        val productRecord = ProducerRecord<String, String>(
+            "shoppingBasket",
+            shoppingBasketEvent.encode()
+        )
+        productRecord.headers()
+            .add("operation", "CHECKOUT".toByteArray())
+            .add("source", "shopping-basket-service".toByteArray())
+            .add("timestamp", System.currentTimeMillis().toString().toByteArray())
+
+        shoppingBasketProducer
+            ?.send(productRecord)
+            ?.get()
+
+        // Expect the order NOT to be created
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+            assertEquals(0, orderRepository.countWithRequestContext())
+        }
+
+        // And expect no event to be thrown
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        assertEquals(0, records.count())
     }
 }

@@ -31,6 +31,7 @@ class OfferingService {
         entity.apply {
             quantity = offering.quantity
             productId = offering.productId
+            status = offering.status
         }
     }
 }
