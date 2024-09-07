@@ -20,8 +20,8 @@ class ShoppingBasketConsumer {
     fun consume(record: ConsumerRecord<String, ShoppingBasket>) {
         val operation = record.headers().lastHeader("operation")
         println("Received Shopping Basket event with operation: ${String(operation.value())}")
-        println(record.value())
 
+        // TODO: Decide if we even need the event representation or if we can work with the ShoppingBasket directly
         val event = ShoppingBasketEvent(
             source = EventSource.from(String(record.headers().lastHeader("source").value())),
             operation = EventOperation.from(String(record.headers().lastHeader("operation").value())),
