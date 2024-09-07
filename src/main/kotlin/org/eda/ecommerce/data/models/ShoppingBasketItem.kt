@@ -12,8 +12,8 @@ class ShoppingBasketItem {
     lateinit var shoppingBasketId: UUID
 
     lateinit var offeringId: UUID
-    lateinit var quantity: Number
-    lateinit var totalPrice: Number
+    var quantity: Int? = null
+    var totalPrice: Float? = null
     lateinit var itemState: ItemState
 
     override fun toString(): String {

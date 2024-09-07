@@ -19,10 +19,10 @@ class Order : PanacheEntityBase() {
     lateinit var customerId: UUID
     lateinit var orderDate: String
     lateinit var orderStatus: OrderStatus
-    lateinit var totalPrice: Number
-    lateinit var totalItemQuantity: Number
+    var totalPrice: Float? = null
+    var totalItemQuantity: Int? = null
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     lateinit var items: MutableList<ShoppingBasketItem>
 
     override fun toString(): String {

@@ -11,8 +11,8 @@ class ShoppingBasket : PanacheEntityBase() {
     lateinit var shoppingBasketId: UUID
 
     lateinit var customerId: UUID
-    lateinit var totalPrice: Number
-    lateinit var totalItemQuantity: Number
+    var totalPrice: Float? = null
+    var totalItemQuantity: Int? = null
 
     @ElementCollection
     lateinit var items: MutableList<ShoppingBasketItem>

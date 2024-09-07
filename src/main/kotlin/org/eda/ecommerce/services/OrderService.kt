@@ -1,13 +1,12 @@
 package org.eda.ecommerce.services
 
 import io.quarkus.vertx.ConsumeEvent
-import io.smallrye.common.annotation.Blocking
 import io.smallrye.reactive.messaging.MutinyEmitter
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
-import org.eda.ecommerce.data.events.external.incoming.StorableKafkaEvent
+import org.eda.ecommerce.data.events.external.incoming.EDAEvent
 import org.eda.ecommerce.data.events.external.outgoing.OrderCreatedKafkaMessage
 import org.eda.ecommerce.data.events.external.outgoing.OrderDeletedKafkaMessage
 import org.eda.ecommerce.data.events.external.outgoing.OrderUpdatedKafkaMessage
@@ -47,9 +46,10 @@ class OrderService {
     }
 
     @ConsumeEvent("shopping-basket-checkout")
-    @Blocking // TODO: this seems to be not a good idea... We might need to force every handler to be blocking OR figure out this magic event ending thing in the EventHandler
-    fun createOrderFromShoppingBasket(orderCreatedEvent: StorableKafkaEvent<ShoppingBasket>) {
+    fun createOrderFromShoppingBasket(orderCreatedEvent: EDAEvent<ShoppingBasket>) {
         println("Creating order from shopping basket: $orderCreatedEvent")
+
+        // TODO: Map Offerings to Products (aka sum up individual product counts) and store those alongside the offerings in the Order and include them in the emitted event
 
         val order = Order().apply {
             customerId = orderCreatedEvent.payload!!.customerId
