@@ -19,7 +19,6 @@
         port: 32801
 
 quarkus:
-  test-port: 0
   swagger-ui:
     always-include: true
   kafka:
