@@ -1,4 +1,4 @@
-package org.eda.ecommerce.communication.httpEndpoints
+package org.eda.ecommerce.order.communication.httpEndpoints
 
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.ws.rs.GET

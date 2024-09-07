@@ -1,6 +1,7 @@
-package org.eda.ecommerce.data.events.external.incoming
+package org.eda.ecommerce.order.data.events.external.incoming
 
-import org.eda.ecommerce.data.models.ShoppingBasket
+import org.eda.ecommerce.order.data.models.ShoppingBasket
+import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent
 
 class ShoppingBasketEvent(source: Any, operation: Any, timestamp: String, payload: ShoppingBasket) : EDAEvent<ShoppingBasket>() {
     init {

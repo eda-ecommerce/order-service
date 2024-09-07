@@ -1,4 +1,4 @@
-package org.eda.ecommerce.services
+package org.eda.ecommerce.order.services
 
 import io.quarkus.vertx.ConsumeEvent
 import io.smallrye.reactive.messaging.MutinyEmitter
@@ -6,14 +6,14 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
-import org.eda.ecommerce.data.events.external.incoming.EDAEvent
-import org.eda.ecommerce.data.events.external.outgoing.OrderCreatedKafkaMessage
-import org.eda.ecommerce.data.events.external.outgoing.OrderDeletedKafkaMessage
-import org.eda.ecommerce.data.events.external.outgoing.OrderUpdatedKafkaMessage
-import org.eda.ecommerce.data.models.Order
-import org.eda.ecommerce.data.models.Order.OrderStatus
-import org.eda.ecommerce.data.models.ShoppingBasket
-import org.eda.ecommerce.data.repositories.OrderRepository
+import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderCreatedKafkaMessage
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderDeletedKafkaMessage
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderUpdatedKafkaMessage
+import org.eda.ecommerce.order.data.models.Order
+import org.eda.ecommerce.order.data.models.Order.OrderStatus
+import org.eda.ecommerce.order.data.models.ShoppingBasket
+import org.eda.ecommerce.order.data.repositories.OrderRepository
 import java.util.*
 
 @ApplicationScoped

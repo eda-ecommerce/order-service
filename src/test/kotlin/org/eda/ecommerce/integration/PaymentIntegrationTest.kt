@@ -11,9 +11,9 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
-import org.eda.ecommerce.data.models.Order
-import org.eda.ecommerce.data.models.Order.OrderStatus
-import org.eda.ecommerce.data.repositories.OrderRepository
+import org.eda.ecommerce.order.data.models.Order
+import org.eda.ecommerce.order.data.models.Order.OrderStatus
+import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.junit.jupiter.api.*
 import java.util.*
 import java.util.concurrent.TimeUnit

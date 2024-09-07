@@ -1,4 +1,4 @@
-package org.eda.ecommerce.data.events.external.incoming
+package org.eda.ecommerce.order.data.events.external.incoming
 
 import com.fasterxml.jackson.annotation.JsonValue
 

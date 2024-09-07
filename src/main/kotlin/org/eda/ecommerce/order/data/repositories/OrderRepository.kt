@@ -1,7 +1,7 @@
-package org.eda.ecommerce.data.repositories
+package org.eda.ecommerce.order.data.repositories
 
 import jakarta.enterprise.context.ApplicationScoped
-import org.eda.ecommerce.data.models.Order
+import org.eda.ecommerce.order.data.models.Order
 
 @ApplicationScoped
 class OrderRepository : TestableUUIDEntityRepository<Order>()
