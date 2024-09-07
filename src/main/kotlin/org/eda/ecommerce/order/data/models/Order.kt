@@ -29,7 +29,7 @@ class Order : PanacheEntityBase() {
     lateinit var products: MutableList<ProductQuantity>
 
     override fun toString(): String {
-        return "ShoppingBasket(id=${id}, shoppingBasketId=$shoppingBasketId, customerId=$customerId, orderDate=$orderDate, orderStatus=$orderStatus, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity items=$items)"
+        return "Order(id=$id, shoppingBasketId=$shoppingBasketId, customerId=$customerId, orderDate=$orderDate, orderStatus=$orderStatus, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity, items=$items, products=$products)"
     }
 
     enum class OrderStatus(@JsonValue val value: String) {
