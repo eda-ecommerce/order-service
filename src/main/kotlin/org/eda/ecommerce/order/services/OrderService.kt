@@ -1,6 +1,5 @@
 package org.eda.ecommerce.order.services
 
-import io.quarkus.vertx.ConsumeEvent
 import io.smallrye.reactive.messaging.MutinyEmitter
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
@@ -45,7 +44,6 @@ class OrderService {
         return true
     }
 
-    @ConsumeEvent("shopping-basket-checkout")
     fun createOrderFromShoppingBasket(orderCreatedEvent: EDAEvent<ShoppingBasket>) {
         println("Creating order from shopping basket: $orderCreatedEvent")
 
