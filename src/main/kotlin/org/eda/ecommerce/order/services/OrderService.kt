@@ -77,13 +77,9 @@ class OrderService {
             products = productQuantities
         }
 
-        persistAndSendEvent(order)
-    }
-
-
-    @Transactional
-    fun persistAndSendEvent(order: Order) {
         orderRepository.persist(order)
+
+        println("Created order: $order")
 
         orderEmitter.sendMessageAndAwait(OrderCreatedKafkaMessage(order))
     }
