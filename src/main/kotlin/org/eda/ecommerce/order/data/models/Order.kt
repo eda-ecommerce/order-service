@@ -25,6 +25,9 @@ class Order : PanacheEntityBase() {
     @ElementCollection(fetch = FetchType.EAGER)
     lateinit var items: MutableList<ShoppingBasketItem>
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    lateinit var products: MutableList<ProductQuantity>
+
     override fun toString(): String {
         return "ShoppingBasket(id=${id}, shoppingBasketId=$shoppingBasketId, customerId=$customerId, orderDate=$orderDate, orderStatus=$orderStatus, totalPrice=$totalPrice, totalItemQuantity=$totalItemQuantity items=$items)"
     }

@@ -11,8 +11,10 @@ import org.eda.ecommerce.order.data.events.external.outgoing.OrderDeletedKafkaMe
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderUpdatedKafkaMessage
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
+import org.eda.ecommerce.order.data.models.ProductQuantity
 import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.data.repositories.OrderRepository
+import org.eda.ecommerce.order.exceptions.OfferingNotFoundException
 import java.util.*
 
 @ApplicationScoped
@@ -20,6 +22,9 @@ class OrderService {
 
     @Inject
     private lateinit var orderRepository: OrderRepository
+
+    @Inject
+    private lateinit var offeringService: OfferingService
 
     @Inject
     @Channel("order-out")
@@ -44,19 +49,32 @@ class OrderService {
         return true
     }
 
+    @Transactional
     fun createOrderFromShoppingBasket(orderCreatedEvent: EDAEvent<ShoppingBasket>) {
-        println("Creating order from shopping basket: $orderCreatedEvent")
+        val shoppingBasket = orderCreatedEvent.payload!!
 
-        // TODO: Map Offerings to Products (aka sum up individual product counts) and store those alongside the offerings in the Order and include them in the emitted event
+        println("Creating order from shopping basket: $shoppingBasket")
+
+        // Map Offerings to Products (aka sum up individual product counts) and store those alongside the offerings in the Order
+        val shoppingBasketItems = shoppingBasket.items
+        val productQuantities = mutableListOf<ProductQuantity>()
+        shoppingBasketItems.forEach { item ->
+            val offering = offeringService.findById(item.offeringId) ?: throw OfferingNotFoundException(item.offeringId, "Cannot create order from shopping basket ${shoppingBasket.shoppingBasketId}")
+
+            val totalQuantity = offering.quantity.times(item.quantity)
+
+            productQuantities.add(ProductQuantity(offering.productId, totalQuantity))
+        }
 
         val order = Order().apply {
-            customerId = orderCreatedEvent.payload!!.customerId
+            customerId = shoppingBasket.customerId
             orderDate = orderCreatedEvent.timestamp
             orderStatus = OrderStatus.InProcess
-            totalPrice = orderCreatedEvent.payload!!.totalPrice
-            totalItemQuantity = orderCreatedEvent.payload!!.totalItemQuantity
-            shoppingBasketId = orderCreatedEvent.payload!!.shoppingBasketId
-            items = orderCreatedEvent.payload!!.items
+            totalPrice = shoppingBasket.totalPrice
+            totalItemQuantity = shoppingBasket.totalItemQuantity
+            shoppingBasketId = shoppingBasket.shoppingBasketId
+            items = shoppingBasketItems
+            products = productQuantities
         }
 
         persistAndSendEvent(order)
