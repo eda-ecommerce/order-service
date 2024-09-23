@@ -5,7 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
-import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent
+import org.eda.ecommerce.order.data.events.external.incoming.ShoppingBasketEvent
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderCreatedKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderDeletedKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderUpdatedKafkaMessage
@@ -13,7 +13,6 @@ import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.models.ProductQuantity
-import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.eda.ecommerce.order.exceptions.OfferingNotActiveException
 import org.eda.ecommerce.order.exceptions.OfferingNotFoundException
@@ -52,7 +51,7 @@ class OrderService {
     }
 
     @Transactional
-    fun createOrderFromShoppingBasket(orderCreatedEvent: EDAEvent<ShoppingBasket>) {
+    fun createOrderFromShoppingBasket(orderCreatedEvent: ShoppingBasketEvent) {
         val shoppingBasket = orderCreatedEvent.payload!!
 
         println("Creating order from shopping basket: $shoppingBasket")
