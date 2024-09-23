@@ -2,7 +2,8 @@ package org.eda.ecommerce.order.data.models
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import java.util.*
 
 @Entity
