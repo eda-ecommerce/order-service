@@ -2,13 +2,12 @@ package org.eda.ecommerce.order.data.events.external.incoming
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-abstract class EDAEvent<T>  {
-
-    open lateinit var source: EventSource
-    open lateinit var operation: EventOperation
-    open lateinit var timestamp: String
-
+abstract class EDAEvent<T>(
+    open var source: EventSource,
+    open var operation: EventOperation,
+    open var timestamp: String,
     open var payload: T? = null
+)  {
 
     enum class EventSource(@JsonValue val value: String) {
         SHOPPING_BASKET("shopping-basket-service"),
