@@ -22,13 +22,13 @@ import java.util.concurrent.TimeUnit
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @QuarkusTestResource(KafkaCompanionResource::class)
-class PaymentIntegrationTest {
+class ShippingIntegrationTest {
 
     @Inject
     @Identifier("default-kafka-broker")
     lateinit var kafkaConfig: Map<String, Any>
 
-    lateinit var paymentProducer: KafkaProducer<String, String>
+    lateinit var shippingProducer: KafkaProducer<String, String>
 
     @Inject
     lateinit var orderRepository: OrderRepository
@@ -37,7 +37,7 @@ class PaymentIntegrationTest {
 
     @BeforeEach
     fun setupKafkaHelpers() {
-        paymentProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
+        shippingProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
     }
 
     @BeforeEach
@@ -48,7 +48,7 @@ class PaymentIntegrationTest {
 
     @AfterEach
     fun tearDown() {
-        paymentProducer.close()
+        shippingProducer.close()
     }
 
     @Transactional
@@ -61,26 +61,24 @@ class PaymentIntegrationTest {
     }
 
     @Test
-    fun setOrderStatusWhenPaymentSaidItWasPaid() {
+    fun setOrderStatusWhenShippingSaidItWasDelivered() {
         createOrder()
 
         val shoppingBasketEvent: JsonObject = JsonObject()
-            .put("PaymentId", UUID.randomUUID())
+            .put("ShippingId", UUID.randomUUID())
             .put("OrderId", orderId)
-            .put("PaymentDate", Date().toString())
-            .put("CreatedDate", Date().toString())
-            .put("status", "paid")
+            .put("status", "delivered")
 
         val productRecord = ProducerRecord<String, String>(
-            "payment",
+            "shipping",
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
             .add("operation", "updated".toByteArray())
-            .add("source", "payment".toByteArray())
+            .add("source", "shipping".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
-        paymentProducer
+        shippingProducer
             .send(productRecord)
             .get()
 
@@ -90,7 +88,7 @@ class PaymentIntegrationTest {
             val order = orderRepository.findByIdWithRequestContext(orderId)
 
             Assertions.assertEquals(orderId, order?.id)
-            Assertions.assertEquals(OrderStatus.Paid, order?.orderStatus)
+            Assertions.assertEquals(OrderStatus.Fulfilled, order?.orderStatus)
         }
     }
 
