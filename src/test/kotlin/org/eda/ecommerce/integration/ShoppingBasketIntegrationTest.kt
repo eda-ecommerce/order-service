@@ -145,7 +145,7 @@ class ShoppingBasketIntegrationTest {
             val order = orderRepository.getFirstWithRequestContext()
 
             assertEquals(basketId, order.shoppingBasketId)
-            assertEquals(OrderStatus.InProcess, order.orderStatus)
+            assertEquals(OrderStatus.Requested, order.orderStatus)
             assertEquals(customerId, order.customerId)
             assertEquals(totalPrice, order.totalPrice)
             assertEquals(requestedOfferingCount, order.totalItemQuantity)
@@ -172,7 +172,7 @@ class ShoppingBasketIntegrationTest {
         assertEquals("order", eventHeaders["source"])
         assertEquals("requested", eventHeaders["operation"])
         assertEquals(basketId.toString(), eventPayload.shoppingBasketId.toString())
-        assertEquals(OrderStatus.InProcess, eventPayload.orderStatus)
+        assertEquals(OrderStatus.Requested, eventPayload.orderStatus)
         assertEquals(customerId.toString(), eventPayload.customerId.toString())
         assertEquals(totalPrice, eventPayload.totalPrice)
         assertEquals(requestedOfferingCount, eventPayload.totalItemQuantity)

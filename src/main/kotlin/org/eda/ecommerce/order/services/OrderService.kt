@@ -59,7 +59,7 @@ class OrderService {
         val order = Order().apply {
             customerId = shoppingBasket.customerId
             orderDate = Date().toString()
-            orderStatus = OrderStatus.InProcess
+            orderStatus = OrderStatus.Requested
             totalPrice = shoppingBasket.totalPrice
             totalItemQuantity = shoppingBasket.totalItemQuantity
             shoppingBasketId = shoppingBasket.shoppingBasketId

@@ -33,9 +33,9 @@ class Order : PanacheEntityBase() {
     }
 
     enum class OrderStatus(@JsonValue val value: String) {
-        InProcess("InProcess"),
+        Requested("Requested"),
+        Confirmed("Confirmed"),
         Cancelled("Cancelled"),
-        Completed("Completed"),
-        Paid("Paid");
+        Fulfilled("Fulfilled");
     }
 }
