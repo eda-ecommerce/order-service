@@ -2,8 +2,17 @@ package org.eda.ecommerce.order.data.events.external.outgoing
 
 import org.eda.ecommerce.order.data.models.Order
 
-class OrderCreatedKafkaMessage(order: Order) : KafkaCreatedMessage<Order>(order)
+enum class OrderOperations(override val value: String) : Operation {
+    REQUESTED("requested"),
+    CONFIRMED("confirmed"),
+    FULFILLED("fulfilled"),
+    CANCELLED("cancelled")
+}
 
-class OrderUpdatedKafkaMessage(order: Order) : KafkaUpdatedMessage<Order>(order)
+class OrderRequestedKafkaMessage(order: Order) : KafkaMessage<Order>(OrderOperations.REQUESTED, order)
 
-class OrderDeletedKafkaMessage(order: Order) : KafkaDeletedMessage<Order>(order)
+class OrderConfirmedKafkaMessage(order: Order) : KafkaMessage<Order>(OrderOperations.CONFIRMED, order)
+
+class OrderFulfilledKafkaMessage(order: Order) : KafkaMessage<Order>(OrderOperations.FULFILLED, order)
+
+class OrderCancelledKafkaMessage(order: Order) : KafkaMessage<Order>(OrderOperations.CANCELLED, order)

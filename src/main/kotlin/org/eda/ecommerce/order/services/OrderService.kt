@@ -5,9 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
-import org.eda.ecommerce.order.data.events.external.outgoing.OrderCreatedKafkaMessage
-import org.eda.ecommerce.order.data.events.external.outgoing.OrderDeletedKafkaMessage
-import org.eda.ecommerce.order.data.events.external.outgoing.OrderUpdatedKafkaMessage
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderRequestedKafkaMessage
 import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
@@ -37,17 +35,6 @@ class OrderService {
 
     fun findById(id: UUID): Order {
         return orderRepository.findById(id)
-    }
-
-    @Transactional
-    fun deleteById(id: UUID): Boolean {
-        val orderToDelete = orderRepository.findById(id) ?: return false
-
-        orderRepository.delete(orderToDelete)
-
-        orderEmitter.sendMessageAndAwait(OrderDeletedKafkaMessage(orderToDelete))
-
-        return true
     }
 
     @Transactional
@@ -84,27 +71,7 @@ class OrderService {
 
         println("Created order: $order")
 
-        orderEmitter.sendMessageAndAwait(OrderCreatedKafkaMessage(order))
-    }
-
-    @Transactional
-    fun updateOrder(order: Order): Boolean {
-        val entity = orderRepository.findById(order.id) ?: return false
-
-        entity.apply {
-            customerId = order.customerId
-            orderDate = order.orderDate
-            orderStatus = order.orderStatus
-            totalPrice = order.totalPrice
-            items = order.items
-        }
-
-        orderRepository.persist(entity)
-
-
-        orderEmitter.sendMessageAndAwait(OrderUpdatedKafkaMessage(entity))
-
-        return true
+        orderEmitter.sendMessageAndAwait(OrderRequestedKafkaMessage(order))
     }
 
 }

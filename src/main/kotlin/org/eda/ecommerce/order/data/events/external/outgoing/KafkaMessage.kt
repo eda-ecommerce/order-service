@@ -5,8 +5,8 @@ import org.apache.kafka.common.header.internals.RecordHeaders
 import org.eclipse.microprofile.reactive.messaging.Message
 import org.eclipse.microprofile.reactive.messaging.Metadata
 
-open class KafkaMessage<T>(operation: String, value: T) : Message<T> {
-    private val message: Message<T> = createMessageWithMetadata(value, operation)
+open class KafkaMessage<T>(operation : Operation, value: T) : Message<T> {
+    private val message: Message<T> = createMessageWithMetadata(value, operation.value)
 
     override fun getPayload(): T = message.payload
     override fun getMetadata(): Metadata = message.metadata
@@ -26,8 +26,6 @@ open class KafkaMessage<T>(operation: String, value: T) : Message<T> {
     }
 }
 
-open class KafkaCreatedMessage<T>(value: T) : KafkaMessage<T>("created", value)
-
-open class KafkaUpdatedMessage<T>(value: T) : KafkaMessage<T>("updated", value)
-
-open class KafkaDeletedMessage<T>(value: T) : KafkaMessage<T>("deleted", value)
+interface Operation {
+    val value: String
+}

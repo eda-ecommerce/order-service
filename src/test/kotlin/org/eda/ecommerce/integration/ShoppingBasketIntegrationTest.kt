@@ -170,7 +170,7 @@ class ShoppingBasketIntegrationTest {
         val eventPayload = event.value()
 
         assertEquals("order", eventHeaders["source"])
-        assertEquals("created", eventHeaders["operation"])
+        assertEquals("requested", eventHeaders["operation"])
         assertEquals(basketId.toString(), eventPayload.shoppingBasketId.toString())
         assertEquals(OrderStatus.InProcess, eventPayload.orderStatus)
         assertEquals(customerId.toString(), eventPayload.customerId.toString())
