@@ -6,14 +6,13 @@ import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderRequestedKafkaMessage
-import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.models.ProductQuantity
 import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.data.repositories.OrderRepository
-import org.eda.ecommerce.order.exceptions.OfferingNotActiveException
-import org.eda.ecommerce.order.exceptions.OfferingNotFoundException
+import org.eda.ecommerce.order.exceptions.EventProcessingException
+import org.eda.ecommerce.order.exceptions.InvalidShoppingBasketException
 import java.util.*
 
 @ApplicationScoped
@@ -45,14 +44,13 @@ class OrderService {
         val shoppingBasketItems = shoppingBasket.items
         val productQuantities = mutableListOf<ProductQuantity>()
         shoppingBasketItems.forEach { item ->
-            val offering = offeringService.findById(item.offeringId) ?: throw OfferingNotFoundException(item.offeringId, "Cannot create order from shopping basket ${shoppingBasket.shoppingBasketId}")
-
-            if (offering.status != Offering.OfferingStatus.ACTIVE) {
-                throw OfferingNotActiveException(item.offeringId, "Cannot create order from shopping basket ${shoppingBasket.shoppingBasketId}")
+            val offering = try {
+                offeringService.getOfferingIfAvailableForOrder(item.offeringId)
+            } catch (e: EventProcessingException) {
+                throw InvalidShoppingBasketException(shoppingBasket.shoppingBasketId, e.message ?: "")
             }
 
-            val totalQuantity = offering.quantity.times(item.quantity)
-
+            val totalQuantity = offering.quantity * item.quantity
             productQuantities.add(ProductQuantity(offering.productId, totalQuantity))
         }
 
