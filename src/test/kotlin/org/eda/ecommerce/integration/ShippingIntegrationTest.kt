@@ -11,6 +11,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.repositories.OrderRepository
@@ -32,6 +33,9 @@ class ShippingIntegrationTest {
 
     @Inject
     lateinit var orderRepository: OrderRepository
+
+    @ConfigProperty(name = "test.eventing.assertion-timeout", defaultValue = "10")
+    lateinit var timeoutInSeconds: String
 
     val orderId: UUID = UUID.randomUUID()
 
@@ -82,7 +86,7 @@ class ShippingIntegrationTest {
             .send(productRecord)
             .get()
 
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
             Assertions.assertEquals(1, orderRepository.countWithRequestContext())
 
             val order = orderRepository.findByIdWithRequestContext(orderId)

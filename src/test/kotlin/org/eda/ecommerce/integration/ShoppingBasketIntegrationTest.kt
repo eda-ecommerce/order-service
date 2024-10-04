@@ -12,14 +12,15 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eda.ecommerce.helpers.CheckoutEventFactory
+import org.eda.ecommerce.helpers.KafkaTestHelper
+import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.models.ShoppingBasketItem
-import org.eda.ecommerce.order.data.repositories.OrderRepository
-import org.eda.ecommerce.helpers.KafkaTestHelper
-import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.repositories.OfferingRepository
+import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -39,7 +40,6 @@ class ShoppingBasketIntegrationTest {
     @InjectKafkaCompanion
     lateinit var companion: KafkaCompanion
 
-
     lateinit var shoppingBasketProducer: KafkaProducer<String, String>
     lateinit var consumer: KafkaConsumer<String, Order>
 
@@ -48,6 +48,9 @@ class ShoppingBasketIntegrationTest {
 
     @Inject
     lateinit var offeringRepository: OfferingRepository
+
+    @ConfigProperty(name = "test.eventing.assertion-timeout", defaultValue = "10")
+    lateinit var timeoutInSeconds: String
 
     val customerId: UUID = UUID.randomUUID()
 
@@ -139,7 +142,7 @@ class ShoppingBasketIntegrationTest {
             ?.send(productRecord)
             ?.get()
 
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
             assertEquals(1, orderRepository.countWithRequestContext())
 
             val order = orderRepository.getFirstWithRequestContext()
@@ -210,7 +213,7 @@ class ShoppingBasketIntegrationTest {
             ?.get()
 
         // Expect the order NOT to be created
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
             assertEquals(0, orderRepository.countWithRequestContext())
         }
 
@@ -248,7 +251,7 @@ class ShoppingBasketIntegrationTest {
             ?.get()
 
         // Expect the order NOT to be created
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
             assertEquals(0, orderRepository.countWithRequestContext())
         }
 
@@ -286,7 +289,7 @@ class ShoppingBasketIntegrationTest {
             ?.get()
 
         // Expect the order NOT to be created
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted {
+        await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
             assertEquals(0, orderRepository.countWithRequestContext())
         }
 
