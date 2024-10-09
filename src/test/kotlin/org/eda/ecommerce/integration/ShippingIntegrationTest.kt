@@ -7,15 +7,20 @@ import io.smallrye.common.annotation.Identifier
 import io.vertx.core.json.JsonObject
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
+import org.apache.kafka.clients.consumer.ConsumerRecords
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.eda.ecommerce.helpers.KafkaTestHelper
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -30,6 +35,7 @@ class ShippingIntegrationTest {
     lateinit var kafkaConfig: Map<String, Any>
 
     lateinit var shippingProducer: KafkaProducer<String, String>
+    lateinit var consumer: KafkaConsumer<String, Order>
 
     @Inject
     lateinit var orderRepository: OrderRepository
@@ -42,6 +48,7 @@ class ShippingIntegrationTest {
     @BeforeEach
     fun setupKafkaHelpers() {
         shippingProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
+        consumer = KafkaTestHelper.setupConsumer<Order>(kafkaConfig)
     }
 
     @BeforeEach
@@ -53,6 +60,7 @@ class ShippingIntegrationTest {
     @AfterEach
     fun tearDown() {
         shippingProducer.close()
+        KafkaTestHelper.deleteConsumer(consumer)
     }
 
     @Transactional
@@ -65,13 +73,14 @@ class ShippingIntegrationTest {
     }
 
     @Test
-    fun setOrderStatusWhenShippingSaidItWasDelivered() {
+    fun setOrderStatusWhenShippingSaidItWasDeliveredAndThrowEvent() {
+        consumer.subscribe(listOf("order"))
+
         createOrder()
 
         val shoppingBasketEvent: JsonObject = JsonObject()
-            .put("ShippingId", UUID.randomUUID())
-            .put("OrderId", orderId)
-            .put("status", "delivered")
+            .put("shipmentId", UUID.randomUUID())
+            .put("orderId", orderId)
 
         val productRecord = ProducerRecord<String, String>(
             "shipping",
@@ -87,13 +96,26 @@ class ShippingIntegrationTest {
             .get()
 
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
-            Assertions.assertEquals(1, orderRepository.countWithRequestContext())
+            assertEquals(1, orderRepository.countWithRequestContext())
 
             val order = orderRepository.findByIdWithRequestContext(orderId)
 
-            Assertions.assertEquals(orderId, order?.id)
-            Assertions.assertEquals(OrderStatus.Fulfilled, order?.orderStatus)
+            assertEquals(orderId, order?.id)
+            assertEquals(OrderStatus.Fulfilled, order?.orderStatus)
         }
+
+        // And expect event to be thrown
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+
+        assertEquals(1, records.count())
+
+        val event = records.records("order").iterator().asSequence().toList().first()
+        val eventHeaders = event.headers().toList().associateBy({ it.key() }, { it.value().toString(Charsets.UTF_8) })
+        val eventPayload = event.value()
+
+        assertEquals("order", eventHeaders["source"])
+        assertEquals("requested", eventHeaders["operation"])
+        assertEquals(orderId.toString(), eventPayload.id.toString())
     }
 
 }

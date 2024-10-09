@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderFulfilledKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderRequestedKafkaMessage
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
@@ -70,6 +71,17 @@ class OrderService {
         println("Created order: $order")
 
         orderEmitter.sendMessageAndAwait(OrderRequestedKafkaMessage(order))
+    }
+
+    @Transactional
+    fun handleDeliveryById(orderId: UUID) {
+        val order = orderRepository.findById(orderId)
+        order.orderStatus = OrderStatus.Fulfilled
+        orderRepository.persist(order)
+
+        println("Order $orderId has been marked as Fulfilled")
+
+        orderEmitter.sendMessageAndAwait(OrderFulfilledKafkaMessage(order))
     }
 
 }

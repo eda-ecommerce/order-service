@@ -24,6 +24,8 @@
           failure-strategy: "ignore"
         offering-in:
           failure-strategy: "ignore"
+        shipping-in:
+          failure-strategy: "ignore"
 
 test:
   eventing:
@@ -64,4 +66,6 @@ mp:
       shopping-basket-in:
         topic: "shoppingBasket"
       offering-in:
+        topic: "offering"
+      shipping-in:
         topic: "offering"
