@@ -9,7 +9,7 @@ abstract class EDAEvent<T>(
     open var payload: T? = null
 )  {
 
-    enum class EventSource(@JsonValue val value: String) {
+    enum class EventSource(@JsonValue override val value: String) : Enum {
         SHOPPING_BASKET("shopping-basket-service"),
         PAYMENT("payment");
 
@@ -19,15 +19,10 @@ abstract class EDAEvent<T>(
         }
     }
 
-    enum class EventOperation(@JsonValue val value: String) {
-        CREATED("CREATED"),
-        UPDATED("UPDATED"),
-        CHECKOUT("CHECKOUT");
+    interface EventOperation : Enum
 
-        companion object {
-            fun from(search: String): EventOperation =
-                requireNotNull(entries.find { it.value == search }) { "No EventOperation with value $search" }
-        }
+    interface Enum {
+        val value: String
     }
 }
 

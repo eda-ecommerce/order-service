@@ -4,9 +4,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.eclipse.microprofile.reactive.messaging.Incoming
-import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent.EventOperation
 import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent.EventSource
 import org.eda.ecommerce.order.data.events.external.incoming.ShoppingBasketEvent
+import org.eda.ecommerce.order.data.events.external.incoming.operations.ShoppingBasketEventOperation
 import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.exceptions.EmptyEventPayloadException
 import org.eda.ecommerce.order.services.OrderService
@@ -27,7 +27,7 @@ class ShoppingBasketConsumer {
         //       In the future we might care about other fields, but for now, the whole round trip via an EDAEvent instance like ShoppingBasketEvent in this case feels redundant...
         val event = ShoppingBasketEvent(
             source = EventSource.from(String(record.headers().lastHeader("source").value())),
-            operation = EventOperation.from(String(record.headers().lastHeader("operation").value())),
+            operation = ShoppingBasketEventOperation.from(String(record.headers().lastHeader("operation").value())),
             timestamp = record.headers().lastHeader("timestamp").toString(),
             payload = record.value()
         )
@@ -38,9 +38,8 @@ class ShoppingBasketConsumer {
         )
 
         when (event.operation) {
-            EventOperation.CHECKOUT -> orderService.createOrderFromShoppingBasket(shoppingBasket)
-            EventOperation.CREATED -> throw NotImplementedError("Shopping Basket creation is not supported")
-            EventOperation.UPDATED -> throw NotImplementedError("Shopping Basket update is not supported")
+            ShoppingBasketEventOperation.CHECKOUT -> orderService.createOrderFromShoppingBasket(shoppingBasket)
+            ShoppingBasketEventOperation.CREATED -> throw NotImplementedError("Shopping Basket creation is not supported")
         }
     }
 }

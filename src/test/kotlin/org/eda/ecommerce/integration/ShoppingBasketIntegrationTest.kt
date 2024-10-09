@@ -134,7 +134,7 @@ class ShoppingBasketIntegrationTest {
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
-            .add("operation", "CHECKOUT".toByteArray())
+            .add("operation", "checkout".toByteArray())
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
@@ -204,7 +204,7 @@ class ShoppingBasketIntegrationTest {
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
-            .add("operation", "CHECKOUT".toByteArray())
+            .add("operation", "checkout".toByteArray())
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
@@ -242,7 +242,7 @@ class ShoppingBasketIntegrationTest {
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
-            .add("operation", "CHECKOUT".toByteArray())
+            .add("operation", "checkout".toByteArray())
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
@@ -280,7 +280,7 @@ class ShoppingBasketIntegrationTest {
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
-            .add("operation", "CHECKOUT".toByteArray())
+            .add("operation", "checkout".toByteArray())
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
