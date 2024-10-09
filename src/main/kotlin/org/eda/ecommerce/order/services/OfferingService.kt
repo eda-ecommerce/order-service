@@ -40,7 +40,7 @@ class OfferingService {
     fun getOfferingIfAvailableForOrder(id: UUID): Offering {
         val offering = findById(id) ?: throw OfferingNotFoundException(id)
 
-        if (offering.status != Offering.OfferingStatus.ACTIVE) {
+        if (!offering.isAvailableToOrder()) {
             throw OfferingNotActiveException(id)
         }
 

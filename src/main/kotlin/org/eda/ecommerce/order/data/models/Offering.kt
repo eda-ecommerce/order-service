@@ -17,6 +17,10 @@ class Offering : PanacheEntityBase() {
 
     lateinit var status: OfferingStatus
 
+    fun isAvailableToOrder(): Boolean {
+        return status == OfferingStatus.ACTIVE
+    }
+
     override fun toString(): String {
         return "Offering(id=$id, quantity=$quantity, productId=$productId), status=$status"
     }
