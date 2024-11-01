@@ -43,8 +43,6 @@ class ShippingIntegrationTest {
     @ConfigProperty(name = "test.eventing.assertion-timeout", defaultValue = "10")
     lateinit var timeoutInSeconds: String
 
-    val orderId: UUID = UUID.randomUUID()
-
     @BeforeEach
     fun setupKafkaHelpers() {
         shippingProducer = KafkaProducer(kafkaConfig, StringSerializer(), StringSerializer())
@@ -64,43 +62,45 @@ class ShippingIntegrationTest {
     }
 
     @Transactional
-    fun createOrder() {
+    fun createOrder(): Order {
         val order = Order().apply {
-            id = orderId
+            shoppingBasketId = UUID.randomUUID()
+            customerId = UUID.randomUUID()
+            orderDate = "2021-01-01"
+            orderStatus = OrderStatus.Requested
+            items = mutableListOf()
+            products = mutableListOf()
         }
 
         orderRepository.persist(order)
+
+        return order
     }
 
     @Test
     fun setOrderStatusWhenShippingSaidItWasDeliveredAndThrowEvent() {
         consumer.subscribe(listOf("order"))
 
-        createOrder()
+        val order = createOrder()
 
         val shoppingBasketEvent: JsonObject = JsonObject()
             .put("shipmentId", UUID.randomUUID())
-            .put("orderId", orderId)
+            .put("orderId", order.id)
 
         val productRecord = ProducerRecord<String, String>(
-            "shipping",
+            "shipments",
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
-            .add("operation", "updated".toByteArray())
-            .add("source", "shipping".toByteArray())
-            .add("timestamp", System.currentTimeMillis().toString().toByteArray())
+            .add("operation", "ShipmentDelivered".toByteArray())
 
         shippingProducer
             .send(productRecord)
             .get()
 
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
-            assertEquals(1, orderRepository.countWithRequestContext())
+            val order = orderRepository.findByIdWithRequestContext(order.id)
 
-            val order = orderRepository.findByIdWithRequestContext(orderId)
-
-            assertEquals(orderId, order?.id)
             assertEquals(OrderStatus.Fulfilled, order?.orderStatus)
         }
 
@@ -114,8 +114,8 @@ class ShippingIntegrationTest {
         val eventPayload = event.value()
 
         assertEquals("order", eventHeaders["source"])
-        assertEquals("requested", eventHeaders["operation"])
-        assertEquals(orderId.toString(), eventPayload.id.toString())
+        assertEquals("fulfilled", eventHeaders["operation"])
+        assertEquals(order.id.toString(), eventPayload.id.toString())
     }
 
 }

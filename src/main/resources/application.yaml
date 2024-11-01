@@ -68,4 +68,4 @@ mp:
       offering-in:
         topic: "offering"
       shipping-in:
-        topic: "offering"
+        topic: "shipments"
