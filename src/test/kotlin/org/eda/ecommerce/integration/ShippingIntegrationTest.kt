@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit
 
 
 @QuarkusTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @QuarkusTestResource(KafkaCompanionResource::class)
 class ShippingIntegrationTest {
 

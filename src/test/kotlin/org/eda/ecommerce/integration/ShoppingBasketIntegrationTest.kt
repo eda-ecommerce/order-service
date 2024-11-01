@@ -1,7 +1,9 @@
 package org.eda.ecommerce.integration
 
+import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.kafka.InjectKafkaCompanion
+import io.quarkus.test.kafka.KafkaCompanionResource
 import io.smallrye.common.annotation.Identifier
 import io.smallrye.reactive.messaging.kafka.companion.KafkaCompanion
 import jakarta.inject.Inject
@@ -31,6 +33,7 @@ import java.util.concurrent.TimeUnit
 
 
 @QuarkusTest
+@QuarkusTestResource(KafkaCompanionResource::class)
 class ShoppingBasketIntegrationTest {
 
     @Inject
