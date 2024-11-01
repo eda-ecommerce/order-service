@@ -99,13 +99,13 @@ class ShippingIntegrationTest {
             .get()
 
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
-            val order = orderRepository.findByIdWithRequestContext(order.id)
+            val foundOrder = orderRepository.findByIdWithRequestContext(order.id)
 
-            assertEquals(OrderStatus.Fulfilled, order?.orderStatus)
+            assertEquals(OrderStatus.Fulfilled, foundOrder?.orderStatus)
         }
 
         // And expect event to be thrown
-        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofSeconds(timeoutInSeconds.toLong()))
 
         assertEquals(1, records.count())
 

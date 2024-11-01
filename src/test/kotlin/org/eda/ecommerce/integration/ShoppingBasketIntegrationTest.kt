@@ -138,9 +138,7 @@ class ShoppingBasketIntegrationTest {
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
-        shoppingBasketProducer
-            ?.send(productRecord)
-            ?.get()
+        shoppingBasketProducer.send(productRecord)?.get()
 
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
             assertEquals(1, orderRepository.countWithRequestContext())
@@ -164,7 +162,7 @@ class ShoppingBasketIntegrationTest {
         }
 
         // And expect event to be thrown
-        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofSeconds(timeoutInSeconds.toLong()))
 
         assertEquals(1, records.count())
 
@@ -208,9 +206,7 @@ class ShoppingBasketIntegrationTest {
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
-        shoppingBasketProducer
-            ?.send(productRecord)
-            ?.get()
+        shoppingBasketProducer.send(productRecord)?.get()
 
         // Expect the order NOT to be created
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
@@ -218,7 +214,7 @@ class ShoppingBasketIntegrationTest {
         }
 
         // And expect no event to be thrown
-        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofSeconds(timeoutInSeconds.toLong()))
         assertEquals(0, records.count())
     }
 
@@ -246,9 +242,7 @@ class ShoppingBasketIntegrationTest {
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
-        shoppingBasketProducer
-            ?.send(productRecord)
-            ?.get()
+        shoppingBasketProducer.send(productRecord)?.get()
 
         // Expect the order NOT to be created
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
@@ -256,7 +250,7 @@ class ShoppingBasketIntegrationTest {
         }
 
         // And expect no event to be thrown
-        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofSeconds(timeoutInSeconds.toLong()))
         assertEquals(0, records.count())
     }
 
@@ -284,9 +278,7 @@ class ShoppingBasketIntegrationTest {
             .add("source", "shopping-basket-service".toByteArray())
             .add("timestamp", System.currentTimeMillis().toString().toByteArray())
 
-        shoppingBasketProducer
-            ?.send(productRecord)
-            ?.get()
+        shoppingBasketProducer.send(productRecord)?.get()
 
         // Expect the order NOT to be created
         await().atMost(timeoutInSeconds.toLong(), TimeUnit.SECONDS).untilAsserted {
@@ -294,7 +286,7 @@ class ShoppingBasketIntegrationTest {
         }
 
         // And expect no event to be thrown
-        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofMillis(10000))
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofSeconds(timeoutInSeconds.toLong()))
         assertEquals(0, records.count())
     }
 }
