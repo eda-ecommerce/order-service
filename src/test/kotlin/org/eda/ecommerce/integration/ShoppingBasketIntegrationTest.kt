@@ -21,8 +21,10 @@ import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.models.ShoppingBasketItem
+import org.eda.ecommerce.order.data.models.StockEntry
 import org.eda.ecommerce.order.data.repositories.OfferingRepository
 import org.eda.ecommerce.order.data.repositories.OrderRepository
+import org.eda.ecommerce.order.data.repositories.StockRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -51,6 +53,9 @@ class ShoppingBasketIntegrationTest {
 
     @Inject
     lateinit var offeringRepository: OfferingRepository
+
+    @Inject
+    lateinit var stockRepository: StockRepository
 
     @ConfigProperty(name = "test.eventing.assertion-timeout", defaultValue = "10")
     lateinit var timeoutInSeconds: String
@@ -111,6 +116,15 @@ class ShoppingBasketIntegrationTest {
         offering.status = pStatus
     }
 
+    @Transactional
+    fun createStockEntry(productId: UUID? = null, availableStock: Int): StockEntry {
+        val stockEntry = StockEntry()
+        stockEntry.productId = productId ?: UUID.randomUUID()
+        stockEntry.availableStock = availableStock
+        stockRepository.persist(stockEntry)
+
+        return stockEntry
+    }
 
     @Test
     fun createOrderOnBasketSubmitAndExpectEvent() {
@@ -131,6 +145,9 @@ class ShoppingBasketIntegrationTest {
         // This is the quantity for the one product in the offering.
         // It is the sum of all occurrences of this product in the basket across multiple possible offerings.
         val expectedProductQuantity = requestedOfferingCount * productsInOfferingCount
+
+        // Create a stock entry with the amount of products expected to be ordered
+        createStockEntry(productId, expectedProductQuantity)
 
         val productRecord = ProducerRecord<String, String>(
             "shoppingBasket",

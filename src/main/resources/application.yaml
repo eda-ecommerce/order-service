@@ -26,6 +26,8 @@
           failure-strategy: "ignore"
         shipping-in:
           failure-strategy: "ignore"
+        stock-in:
+          failure-strategy: "ignore"
 
 test:
   eventing:
@@ -69,3 +71,5 @@ mp:
         topic: "offering"
       shipping-in:
         topic: "shipments"
+      stock-in:
+        topic: "stock"

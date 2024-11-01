@@ -26,6 +26,9 @@ class OrderService {
     private lateinit var offeringService: OfferingService
 
     @Inject
+    private lateinit var stockService: StockService
+
+    @Inject
     @Channel("order-out")
     private lateinit var orderEmitter: MutinyEmitter<Order>
 
@@ -39,7 +42,7 @@ class OrderService {
 
     @Transactional
     fun createOrderFromShoppingBasket(shoppingBasket: ShoppingBasket) {
-        println("Creating order from shopping basket: $shoppingBasket")
+        println("Start order creation from shopping basket: $shoppingBasket")
 
         // Map Offerings to Products (aka sum up individual product counts) and store those alongside the offerings in the Order
         val shoppingBasketItems = shoppingBasket.items
@@ -54,6 +57,8 @@ class OrderService {
             val totalQuantity = offering.quantity * item.quantity
             productQuantities.add(ProductQuantity(offering.productId, totalQuantity))
         }
+
+        stockService.validateAllProductsHaveEnoughAvailableQuantity(productQuantities)
 
         val order = Order().apply {
             customerId = shoppingBasket.customerId
