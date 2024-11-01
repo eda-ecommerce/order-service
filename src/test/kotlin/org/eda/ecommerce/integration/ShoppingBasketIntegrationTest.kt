@@ -84,22 +84,6 @@ class ShoppingBasketIntegrationTest {
         KafkaTestHelper.deleteConsumer(consumer)
     }
 
-    @Transactional
-    fun createOffering(pOfferingId: UUID? = null, pProductId: UUID? = null, pQuantity: Int = 1, pStatus: Offering.OfferingStatus = Offering.OfferingStatus.ACTIVE): Offering {
-        val offering = Offering().apply {
-            id = pOfferingId ?: UUID.randomUUID()
-            productId = pProductId ?: UUID.randomUUID()
-            quantity = pQuantity
-            status = pStatus
-        }
-
-        offeringRepository.persist(offering)
-
-        println("Created offering: $offering")
-
-        return offering
-    }
-
     fun ensureOfferingIsUpdatable(pOffering: Offering) : Offering {
         if (!offeringRepository.isPersistent(pOffering)) {
             println("Offering to update is not persistent. Refreshing from repository with ID: ${pOffering.id}")
@@ -118,16 +102,6 @@ class ShoppingBasketIntegrationTest {
         offering.status = pStatus
     }
 
-    @Transactional
-    fun createStockEntry(productId: UUID? = null, availableStock: Int): StockEntry {
-        val stockEntry = StockEntry()
-        stockEntry.productId = productId ?: UUID.randomUUID()
-        stockEntry.availableStock = availableStock
-        stockRepository.persist(stockEntry)
-
-        return stockEntry
-    }
-
     @Test
     fun createOrderOnBasketSubmitAndExpectEvent() {
         consumer.subscribe(listOf("order"))
@@ -135,7 +109,7 @@ class ShoppingBasketIntegrationTest {
         val offeringId = UUID.randomUUID()
         val productId = UUID.randomUUID()
         val productsInOfferingCount = 2
-        createOffering(offeringId, productId, productsInOfferingCount)
+        entityHelper.createOffering(offeringId, productId, productsInOfferingCount)
 
         val checkoutEventFactory = CheckoutEventFactory(customerId)
         val requestedOfferingCount = 2
@@ -149,7 +123,7 @@ class ShoppingBasketIntegrationTest {
         val expectedProductQuantity = requestedOfferingCount * productsInOfferingCount
 
         // Create a stock entry with the amount of products expected to be ordered
-        createStockEntry(productId, expectedProductQuantity)
+        entityHelper.createStockEntry(productId, expectedProductQuantity)
 
         val productRecord = ProducerRecord<String, String>(
             "shoppingBasket",
@@ -245,7 +219,7 @@ class ShoppingBasketIntegrationTest {
         consumer.subscribe(listOf("order"))
 
         val offeringId = UUID.randomUUID()
-        val offering = createOffering(offeringId)
+        val offering = entityHelper.createOffering(offeringId)
 
         // Now retire the offering
         updateOfferingStatus(offering, Offering.OfferingStatus.RETIRED)
@@ -281,7 +255,7 @@ class ShoppingBasketIntegrationTest {
         consumer.subscribe(listOf("order"))
 
         val offeringId = UUID.randomUUID()
-        val offering = createOffering(offeringId)
+        val offering = entityHelper.createOffering(offeringId)
 
         // Now set the offering to inactive
         updateOfferingStatus(offering, Offering.OfferingStatus.INACTIVE)

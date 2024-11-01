@@ -73,30 +73,6 @@ class StockEntryIntegrationTest {
         KafkaTestHelper.deleteConsumer(consumer)
     }
 
-    @Transactional
-    fun createStockEntry(productId: UUID? = null, availableStock: Int): StockEntry {
-        val stockEntry = StockEntry()
-        stockEntry.productId = productId ?: UUID.randomUUID()
-        stockEntry.availableStock = availableStock
-        stockRepository.persist(stockEntry)
-
-        return stockEntry
-    }
-
-    @Transactional
-    fun createOffering(pOfferingId: UUID? = null, pProductId: UUID? = null, pQuantity: Int = 1): Offering {
-        val offering = Offering().apply {
-            id = pOfferingId ?: UUID.randomUUID()
-            productId = pProductId ?: UUID.randomUUID()
-            quantity = pQuantity
-            status = Offering.OfferingStatus.ACTIVE
-        }
-
-        offeringRepository.persist(offering)
-
-        return offering
-    }
-
     @Test
     fun availableStockIsAdjustedWhenEventIsReceived() {
         val productId = UUID.randomUUID()
@@ -133,10 +109,10 @@ class StockEntryIntegrationTest {
 
         // We create a stock entry with 5 available stock
         val productId = UUID.randomUUID()
-        createStockEntry(productId, 5)
+        entityHelper.createStockEntry(productId, 5)
 
         // We create an offering with 6 quantity of the product we only have 5 of
-        val offering = createOffering(pProductId = productId, pQuantity = 6)
+        val offering = entityHelper.createOffering(pProductId = productId, pQuantity = 6)
 
         val checkoutEventFactory = CheckoutEventFactory(UUID.randomUUID())
 

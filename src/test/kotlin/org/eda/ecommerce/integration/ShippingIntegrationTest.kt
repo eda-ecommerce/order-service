@@ -63,27 +63,11 @@ class ShippingIntegrationTest {
         KafkaTestHelper.deleteConsumer(consumer)
     }
 
-    @Transactional
-    fun createOrder(): Order {
-        val order = Order().apply {
-            shoppingBasketId = UUID.randomUUID()
-            customerId = UUID.randomUUID()
-            orderDate = "2021-01-01"
-            orderStatus = OrderStatus.Requested
-            items = mutableListOf()
-            products = mutableListOf()
-        }
-
-        orderRepository.persist(order)
-
-        return order
-    }
-
     @Test
     fun setOrderStatusWhenShippingSaidItWasDeliveredAndThrowEvent() {
         consumer.subscribe(listOf("order"))
 
-        val order = createOrder()
+        val order = entityHelper.createOrder()
 
         val shoppingBasketEvent: JsonObject = JsonObject()
             .put("shipmentId", UUID.randomUUID())
