@@ -14,6 +14,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.eda.ecommerce.helpers.EntityHelper
 import org.eda.ecommerce.helpers.KafkaTestHelper
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
@@ -37,6 +38,9 @@ class ShippingIntegrationTest {
     lateinit var consumer: KafkaConsumer<String, Order>
 
     @Inject
+    lateinit var entityHelper: EntityHelper
+
+    @Inject
     lateinit var orderRepository: OrderRepository
 
     @ConfigProperty(name = "test.eventing.assertion-timeout", defaultValue = "10")
@@ -49,9 +53,8 @@ class ShippingIntegrationTest {
     }
 
     @BeforeEach
-    @Transactional
     fun cleanRepositoryAndKafkaTopics() {
-        orderRepository.deleteAll()
+        entityHelper.clearAllRepositories()
     }
 
     @AfterEach

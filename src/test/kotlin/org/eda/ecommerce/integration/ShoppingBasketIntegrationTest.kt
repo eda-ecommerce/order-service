@@ -16,6 +16,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.awaitility.Awaitility.await
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eda.ecommerce.helpers.CheckoutEventFactory
+import org.eda.ecommerce.helpers.EntityHelper
 import org.eda.ecommerce.helpers.KafkaTestHelper
 import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
@@ -49,6 +50,9 @@ class ShoppingBasketIntegrationTest {
     lateinit var consumer: KafkaConsumer<String, Order>
 
     @Inject
+    lateinit var entityHelper: EntityHelper
+
+    @Inject
     lateinit var orderRepository: OrderRepository
 
     @Inject
@@ -63,10 +67,8 @@ class ShoppingBasketIntegrationTest {
     val customerId: UUID = UUID.randomUUID()
 
     @BeforeEach
-    @Transactional
     fun cleanRepositoryAndKafkaTopics() {
-        orderRepository.deleteAll()
-        offeringRepository.deleteAll()
+        entityHelper.clearAllRepositories()
         KafkaTestHelper.clearTopicIfNotEmpty(companion,"order")
     }
 
