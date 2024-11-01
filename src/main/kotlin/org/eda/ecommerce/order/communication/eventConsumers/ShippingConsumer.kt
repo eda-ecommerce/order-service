@@ -4,7 +4,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.eclipse.microprofile.reactive.messaging.Incoming
-import org.eda.ecommerce.order.data.events.external.incoming.EDAEvent.EventOperation
 import org.eda.ecommerce.order.data.events.external.incoming.operations.ShippingEventOperation
 import org.eda.ecommerce.order.data.models.dto.ShipmentDTO
 import org.eda.ecommerce.order.exceptions.EmptyEventPayloadException

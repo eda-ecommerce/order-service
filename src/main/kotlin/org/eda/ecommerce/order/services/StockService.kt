@@ -8,7 +8,6 @@ import org.eda.ecommerce.order.data.models.StockEntry
 import org.eda.ecommerce.order.data.repositories.StockRepository
 import org.eda.ecommerce.order.exceptions.NoStockRecordsForProductFoundException
 import org.eda.ecommerce.order.exceptions.NotEnoughStockException
-import org.eda.ecommerce.order.exceptions.OfferingNotActiveException
 import java.util.*
 
 @ApplicationScoped

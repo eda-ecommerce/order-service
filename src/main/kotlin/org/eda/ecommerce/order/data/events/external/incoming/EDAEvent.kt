@@ -7,7 +7,7 @@ abstract class EDAEvent<T>(
     open var operation: EventOperation,
     open var timestamp: String,
     open var payload: T? = null
-)  {
+) {
 
     enum class EventSource(@JsonValue override val value: String) : Enum {
         SHOPPING_BASKET("shopping-basket-service"),

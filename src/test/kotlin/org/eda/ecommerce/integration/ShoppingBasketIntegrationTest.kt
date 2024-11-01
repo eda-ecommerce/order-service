@@ -22,12 +22,10 @@ import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.models.ShoppingBasketItem
-import org.eda.ecommerce.order.data.models.StockEntry
 import org.eda.ecommerce.order.data.repositories.OfferingRepository
 import org.eda.ecommerce.order.data.repositories.OrderRepository
-import org.eda.ecommerce.order.data.repositories.StockRepository
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -58,9 +56,6 @@ class ShoppingBasketIntegrationTest {
     @Inject
     lateinit var offeringRepository: OfferingRepository
 
-    @Inject
-    lateinit var stockRepository: StockRepository
-
     @ConfigProperty(name = "test.eventing.assertion-timeout", defaultValue = "10")
     lateinit var timeoutInSeconds: String
 
@@ -69,7 +64,7 @@ class ShoppingBasketIntegrationTest {
     @BeforeEach
     fun cleanRepositoryAndKafkaTopics() {
         entityHelper.clearAllRepositories()
-        KafkaTestHelper.clearTopicIfNotEmpty(companion,"order")
+        KafkaTestHelper.clearTopicIfNotEmpty(companion, "order")
     }
 
     @BeforeEach
@@ -84,7 +79,7 @@ class ShoppingBasketIntegrationTest {
         KafkaTestHelper.deleteConsumer(consumer)
     }
 
-    fun ensureOfferingIsUpdatable(pOffering: Offering) : Offering {
+    fun ensureOfferingIsUpdatable(pOffering: Offering): Offering {
         if (!offeringRepository.isPersistent(pOffering)) {
             println("Offering to update is not persistent. Refreshing from repository with ID: ${pOffering.id}")
             return offeringRepository.findById(pOffering.id)
@@ -150,7 +145,10 @@ class ShoppingBasketIntegrationTest {
             assertEquals(1, order.products.size)
             assertEquals(productId, order.products.first().productId)
             assertEquals(expectedProductQuantity, order.products.first().quantity)
-            assertEquals(UUID.fromString(shoppingBasketItemOne.getString("shoppingBasketItemId")), order.items.first().shoppingBasketItemId)
+            assertEquals(
+                UUID.fromString(shoppingBasketItemOne.getString("shoppingBasketItemId")),
+                order.items.first().shoppingBasketItemId
+            )
             assertEquals(UUID.fromString(shoppingBasketItemOne.getString("offeringId")), order.items.first().offeringId)
             assertEquals(shoppingBasketItemOne.getInteger("quantity"), order.items.first().quantity)
             assertEquals(shoppingBasketItemOne.getFloat("totalPrice"), order.items.first().totalPrice)
@@ -177,7 +175,10 @@ class ShoppingBasketIntegrationTest {
         assertEquals(1, eventPayload.products.size)
         assertEquals(productId.toString(), eventPayload.products.first().productId.toString())
         assertEquals(expectedProductQuantity, eventPayload.products.first().quantity)
-        assertEquals(shoppingBasketItemOne.getString("shoppingBasketItemId"), eventPayload.items.first().shoppingBasketItemId.toString())
+        assertEquals(
+            shoppingBasketItemOne.getString("shoppingBasketItemId"),
+            eventPayload.items.first().shoppingBasketItemId.toString()
+        )
         assertEquals(shoppingBasketItemOne.getString("offeringId"), eventPayload.items.first().offeringId.toString())
         assertEquals(shoppingBasketItemOne.getInteger("quantity"), eventPayload.items.first().quantity)
         assertEquals(shoppingBasketItemOne.getFloat("totalPrice"), eventPayload.items.first().totalPrice)

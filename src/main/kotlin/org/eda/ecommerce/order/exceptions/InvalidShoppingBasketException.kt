@@ -7,5 +7,8 @@ class InvalidShoppingBasketException : EventProcessingException {
 
     constructor(basketId: UUID) : super("ShoppingBasket $basketId is not valid for order creation.")
 
-    constructor(basketId: UUID, failureMode: String) : super("ShoppingBasket $basketId is not valid for order creation. $failureMode")
+    constructor(
+        basketId: UUID,
+        failureMode: String
+    ) : super("ShoppingBasket $basketId is not valid for order creation. $failureMode")
 }

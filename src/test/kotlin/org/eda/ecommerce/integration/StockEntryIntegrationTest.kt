@@ -6,7 +6,6 @@ import io.quarkus.test.kafka.KafkaCompanionResource
 import io.smallrye.common.annotation.Identifier
 import io.vertx.core.json.JsonObject
 import jakarta.inject.Inject
-import jakarta.transaction.Transactional
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -17,14 +16,13 @@ import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eda.ecommerce.helpers.CheckoutEventFactory
 import org.eda.ecommerce.helpers.EntityHelper
 import org.eda.ecommerce.helpers.KafkaTestHelper
-import org.eda.ecommerce.order.data.models.Offering
 import org.eda.ecommerce.order.data.models.Order
-import org.eda.ecommerce.order.data.models.StockEntry
-import org.eda.ecommerce.order.data.repositories.OfferingRepository
 import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.eda.ecommerce.order.data.repositories.StockRepository
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -46,9 +44,6 @@ class StockEntryIntegrationTest {
 
     @Inject
     lateinit var stockRepository: StockRepository
-
-    @Inject
-    lateinit var offeringRepository: OfferingRepository
 
     @Inject
     lateinit var orderRepository: OrderRepository

@@ -6,7 +6,6 @@ import io.quarkus.test.kafka.KafkaCompanionResource
 import io.smallrye.common.annotation.Identifier
 import io.vertx.core.json.JsonObject
 import jakarta.inject.Inject
-import jakarta.transaction.Transactional
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -19,8 +18,10 @@ import org.eda.ecommerce.helpers.KafkaTestHelper
 import org.eda.ecommerce.order.data.models.Order
 import org.eda.ecommerce.order.data.models.Order.OrderStatus
 import org.eda.ecommerce.order.data.repositories.OrderRepository
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit

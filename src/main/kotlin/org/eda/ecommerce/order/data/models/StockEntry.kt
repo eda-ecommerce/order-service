@@ -20,7 +20,7 @@ class StockEntry : PanacheEntityBase() {
         return "Stock(id=$id, productId=$productId, actualStock=$availableStock)"
     }
 
-    fun isAvailableToOrder(requestedAmount: Int =  0): Boolean {
+    fun isAvailableToOrder(requestedAmount: Int = 0): Boolean {
         return availableStock > requestedAmount
     }
 

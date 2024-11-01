@@ -1,8 +1,5 @@
 package org.eda.ecommerce.helpers
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
-import io.vertx.core.json.JsonArray
-import io.vertx.core.json.JsonObject
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
@@ -49,7 +46,12 @@ class EntityHelper {
     }
 
     @Transactional
-    fun createOffering(pOfferingId: UUID? = null, pProductId: UUID? = null, pQuantity: Int = 1, pStatus: Offering.OfferingStatus = Offering.OfferingStatus.ACTIVE): Offering {
+    fun createOffering(
+        pOfferingId: UUID? = null,
+        pProductId: UUID? = null,
+        pQuantity: Int = 1,
+        pStatus: Offering.OfferingStatus = Offering.OfferingStatus.ACTIVE
+    ): Offering {
         val offering = Offering().apply {
             id = pOfferingId ?: UUID.randomUUID()
             productId = pProductId ?: UUID.randomUUID()
