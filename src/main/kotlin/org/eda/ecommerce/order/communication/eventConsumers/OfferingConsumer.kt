@@ -5,7 +5,9 @@ import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.eclipse.microprofile.reactive.messaging.Incoming
+import org.eda.ecommerce.order.data.events.external.incoming.operations.OfferingEventOperation
 import org.eda.ecommerce.order.data.models.Offering
+import org.eda.ecommerce.order.exceptions.EmptyEventPayloadException
 import org.eda.ecommerce.order.services.OfferingService
 
 @ApplicationScoped
@@ -17,12 +19,17 @@ class OfferingConsumer {
     @Incoming("offering-in")
     @Transactional
     fun consume(record: ConsumerRecord<String, Offering>) {
-        val operation = record.headers().lastHeader("operation")
-        println("Received Offering event with operation '${String(operation.value())}' for Offering: ${record.value()}")
+        val operation = String(record.headers().lastHeader("operation").value())
+        println("Received Offering event with operation '$operation'")
 
-        when (String(operation.value())) {
-            "created" -> offeringService.saveOffering(record.value())
-            "updated" -> offeringService.updateOffering(record.value())
+        val offering = record.value() ?: throw EmptyEventPayloadException(
+            "Shopping Basket",
+            operation
+        )
+
+        when (OfferingEventOperation.from(operation)) {
+            OfferingEventOperation.CREATED -> offeringService.saveOffering(offering)
+            OfferingEventOperation.UPDATED -> offeringService.updateOffering(offering)
         }
     }
 
