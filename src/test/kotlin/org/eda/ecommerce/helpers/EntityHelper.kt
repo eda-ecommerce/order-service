@@ -10,6 +10,7 @@ import org.eda.ecommerce.order.data.models.StockEntry
 import org.eda.ecommerce.order.data.repositories.OfferingRepository
 import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.eda.ecommerce.order.data.repositories.StockRepository
+import org.eda.ecommerce.order.data.repositories.UUIDMergeRepository
 import java.util.*
 
 @ApplicationScoped
@@ -82,5 +83,15 @@ class EntityHelper {
         println("[TEST] Created order: $order")
 
         return order
+    }
+
+    @Transactional
+    fun <T> updateEntity(entity: T, repository: UUIDMergeRepository<T>) {
+        if (!repository.isPersistent(entity)) {
+            println("[TEST] Entity is not persistent, trying to persist it by merging")
+            repository.merge(entity)
+        } else {
+            repository.persist(entity)
+        }
     }
 }
