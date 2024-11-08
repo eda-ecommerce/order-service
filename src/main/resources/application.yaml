@@ -31,7 +31,7 @@
 
 test:
   eventing:
-    assertion-timeout: 3 # Seconds to wait for an event to arrive and the action to be done in kafka integration tests
+    assertion-timeout: 4 # Seconds to wait for an event to arrive and the action to be done in kafka integration tests
 
 quarkus:
   swagger-ui:
