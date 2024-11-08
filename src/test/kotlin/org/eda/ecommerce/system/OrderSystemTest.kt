@@ -2,9 +2,11 @@ package org.eda.ecommerce.system
 
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.kafka.InjectKafkaCompanion
 import io.quarkus.test.kafka.KafkaCompanionResource
 import io.restassured.RestAssured.given
 import io.smallrye.common.annotation.Identifier
+import io.smallrye.reactive.messaging.kafka.companion.KafkaCompanion
 import jakarta.inject.Inject
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -31,6 +33,9 @@ class OrderSystemTest {
 
     lateinit var consumer: KafkaConsumer<String, Order>
 
+    @InjectKafkaCompanion
+    lateinit var companion: KafkaCompanion
+
     @Inject
     lateinit var entityHelper: EntityHelper
 
@@ -48,6 +53,7 @@ class OrderSystemTest {
     @BeforeEach
     fun cleanRepositoryAndKafkaTopics() {
         entityHelper.clearAllRepositories()
+        KafkaTestHelper.clearTopicIfNotEmpty(companion, "order")
     }
 
     @AfterEach
@@ -93,8 +99,46 @@ class OrderSystemTest {
             .`when`().post("/order/${UUID.randomUUID()}/confirm")
             .then()
             .statusCode(500)
+    }
 
+    @Test
+    fun cancellationOfOrderSetsStatusAndThrowsEvent() {
+        consumer.subscribe(listOf("order"))
 
+        val createdOrder = entityHelper.createOrder()
+
+        given()
+            .contentType("application/json")
+            .`when`().post("/order/${createdOrder.id}/cancel")
+            .then()
+            .statusCode(200)
+
+        assertEquals(1, orderRepository.countWithRequestContext())
+
+        val order = orderRepository.getFirstWithRequestContext()
+
+        assertEquals(createdOrder.id, order.id)
+        assertEquals(Order.OrderStatus.Canceled, order.orderStatus)
+
+        val records: ConsumerRecords<String, Order> = consumer.poll(Duration.ofSeconds(timeoutInSeconds.toLong()))
+
+        assertEquals(1, records.count())
+
+        val event = records.records("order").iterator().asSequence().toList().first()
+        val eventHeaders = event.headers().toList().associateBy({ it.key() }, { it.value().toString(Charsets.UTF_8) })
+        val eventPayload = event.value()
+
+        assertEquals("cancelled", eventHeaders["operation"])
+        assertEquals(Order.OrderStatus.Canceled, eventPayload.orderStatus)
+    }
+
+    @Test
+    fun cancellationNotAcceptedForNonexistingId() {
+        given()
+            .contentType("application/json")
+            .`when`().post("/order/${UUID.randomUUID()}/cancel")
+            .then()
+            .statusCode(500)
     }
 
 }

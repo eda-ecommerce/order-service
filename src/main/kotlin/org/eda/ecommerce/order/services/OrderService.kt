@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderCancelledKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderConfirmedKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderFulfilledKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderRequestedKafkaMessage
@@ -106,6 +107,25 @@ class OrderService {
         orderRepository.persist(order)
 
         orderEmitter.sendMessageAndAwait(OrderConfirmedKafkaMessage(order))
+
+        return order
+    }
+
+    @Transactional
+    fun cancelOrder(orderId: UUID): Order {
+        val order = orderRepository.findById(orderId)
+
+        if (order == null) {
+            println("Order $orderId not found")
+            throw OrderNotFoundException(orderId, "Cannot cancel non-existing order")
+        }
+
+        order.orderStatus = OrderStatus.Canceled
+
+        println("Order $orderId has been canceled")
+        orderRepository.persist(order)
+
+        orderEmitter.sendMessageAndAwait(OrderCancelledKafkaMessage(order))
 
         return order
     }

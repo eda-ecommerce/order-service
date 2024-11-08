@@ -91,4 +91,31 @@ class OrderController {
 
         return Response.ok(URI.create("/order/" + order.id)).build()
     }
+
+    @POST
+    @Path("{id}/cancel")
+    @Operation(summary = "Cancel an Order.")
+    @APIResponses(
+        APIResponse(
+            responseCode = "200",
+            description = "Order canceled",
+        ),
+        APIResponse(
+            responseCode = "500",
+            description = "Order could not be canceled",
+        )
+    )
+    fun cancel(
+        @PathParam("id")
+        @Parameter(
+            name = "id",
+            description = "The ID of the Order to be confirmed.",
+            schema = Schema(type = SchemaType.STRING, format = "UUID")
+        )
+        id: UUID
+    ): Response {
+        val order = orderService.cancelOrder(id)
+
+        return Response.ok(URI.create("/order/" + order.id)).build()
+    }
 }

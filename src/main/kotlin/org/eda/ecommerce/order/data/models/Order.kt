@@ -34,7 +34,7 @@ class Order {
     enum class OrderStatus(@JsonValue val value: String) {
         Requested("requested"),
         Confirmed("confirmed"),
-        Cancelled("cancelled"),
+        Canceled("canceled"),
         Fulfilled("fulfilled");
     }
 }
