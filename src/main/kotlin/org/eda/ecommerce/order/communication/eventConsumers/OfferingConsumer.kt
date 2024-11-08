@@ -21,7 +21,7 @@ class OfferingConsumer {
         println("Received Offering event with operation '${String(operation.value())}' for Offering: ${record.value()}")
 
         when (String(operation.value())) {
-            "created" -> offeringService.createNewOffering(record.value())
+            "created" -> offeringService.saveOffering(record.value())
             "updated" -> offeringService.updateOffering(record.value())
         }
     }

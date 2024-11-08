@@ -22,8 +22,8 @@ class OfferingService {
         return offeringRepository.findById(id)
     }
 
-    fun createNewOffering(offering: Offering) {
-        println("Creating Offering: $offering")
+    fun saveOffering(offering: Offering) {
+        println("Saved Offering: $offering")
         offeringRepository.persist(offering)
     }
 
