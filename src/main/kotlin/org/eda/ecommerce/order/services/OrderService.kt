@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.reactive.messaging.Channel
+import org.eda.ecommerce.order.data.events.external.outgoing.OrderConfirmedKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderFulfilledKafkaMessage
 import org.eda.ecommerce.order.data.events.external.outgoing.OrderRequestedKafkaMessage
 import org.eda.ecommerce.order.data.models.Order
@@ -14,6 +15,7 @@ import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.eda.ecommerce.order.exceptions.EventProcessingException
 import org.eda.ecommerce.order.exceptions.InvalidShoppingBasketException
+import org.eda.ecommerce.order.exceptions.OrderNotFoundException
 import java.util.*
 
 @ApplicationScoped
@@ -36,7 +38,7 @@ class OrderService {
         return orderRepository.listAll()
     }
 
-    fun findById(id: UUID): Order {
+    fun findById(id: UUID): Order? {
         return orderRepository.findById(id)
     }
 
@@ -87,6 +89,25 @@ class OrderService {
         println("Order $orderId has been marked as Fulfilled")
 
         orderEmitter.sendMessageAndAwait(OrderFulfilledKafkaMessage(order))
+    }
+
+    @Transactional
+    fun confirmOrder(orderId: UUID): Order {
+        val order = orderRepository.findById(orderId)
+
+        if (order == null) {
+            println("Order $orderId not found")
+            throw OrderNotFoundException(orderId, "Cannot confirm non-existing order")
+        }
+
+        order.orderStatus = OrderStatus.Confirmed
+
+        println("Order $orderId has been confirmed")
+        orderRepository.persist(order)
+
+        orderEmitter.sendMessageAndAwait(OrderConfirmedKafkaMessage(order))
+
+        return order
     }
 
 }
