@@ -7,7 +7,7 @@ import jakarta.persistence.Id
 import java.util.*
 
 @Entity
-class Offering : PanacheEntityBase() {
+class Offering {
 
     @Id
     lateinit var id: UUID

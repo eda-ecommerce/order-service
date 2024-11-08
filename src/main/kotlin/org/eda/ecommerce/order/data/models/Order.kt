@@ -7,7 +7,7 @@ import org.hibernate.annotations.GenericGenerator
 import java.util.*
 
 @Entity(name = "Orders")
-class Order : PanacheEntityBase() {
+class Order {
 
     @Id
     @Column(name = "id")

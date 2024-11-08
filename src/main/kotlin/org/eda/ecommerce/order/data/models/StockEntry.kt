@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 import java.util.*
 
 @Entity
-class StockEntry : PanacheEntityBase() {
+class StockEntry {
 
     @Id
     @Column(name = "id")
