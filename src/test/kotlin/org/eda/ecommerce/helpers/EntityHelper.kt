@@ -40,7 +40,7 @@ class EntityHelper {
 
         stockRepository.persist(stockEntry)
 
-        println("Created stock entry: $stockEntry")
+        println("[TEST] Created stock entry: $stockEntry")
 
         return stockEntry
     }
@@ -61,7 +61,7 @@ class EntityHelper {
 
         offeringRepository.persist(offering)
 
-        println("Created offering: $offering")
+        println("[TEST] Created offering: $offering")
 
         return offering
     }
@@ -79,7 +79,7 @@ class EntityHelper {
 
         orderRepository.persist(order)
 
-        println("Created order: $order")
+        println("[TEST] Created order: $order")
 
         return order
     }
