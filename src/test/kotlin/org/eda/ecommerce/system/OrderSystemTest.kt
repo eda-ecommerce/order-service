@@ -141,4 +141,21 @@ class OrderSystemTest {
             .statusCode(500)
     }
 
+    @Test
+    fun confirmationNotAllowedForCancelledOrder() {
+        val createdOrder = entityHelper.createOrder()
+
+        createdOrder.apply {
+            orderStatus = Order.OrderStatus.Canceled
+        }
+
+        entityHelper.updateEntity(createdOrder, orderRepository)
+
+        given()
+            .contentType("application/json")
+            .`when`().post("/order/${createdOrder.id}/confirm")
+            .then()
+            .statusCode(406)
+    }
+
 }

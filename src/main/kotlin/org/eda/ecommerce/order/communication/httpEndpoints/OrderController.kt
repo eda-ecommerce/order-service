@@ -74,8 +74,12 @@ class OrderController {
             description = "Order created",
         ),
         APIResponse(
-            responseCode = "500",
-            description = "Order could not be confirmed",
+            responseCode = "406",
+            description = "Order could not be confirmed because it was canceled",
+        ),
+        APIResponse(
+            responseCode = "404",
+            description = "Order not found and thus could not be confirmed",
         )
     )
     fun confirm(
@@ -87,9 +91,15 @@ class OrderController {
         )
         id: UUID
     ): Response {
-        val order = orderService.confirmOrder(id)
+        try {
+            orderService.confirmOrder(id)
+        } catch (e: OrderNotFoundException) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e).build()
+        } catch (e: OrderCancelledException) {
+            return Response.status(Response.Status.NOT_ACCEPTABLE).entity(e).build()
+        }
 
-        return Response.ok(URI.create("/order/" + order.id)).build()
+        return Response.ok(URI.create("/order/$id")).build()
     }
 
     @POST

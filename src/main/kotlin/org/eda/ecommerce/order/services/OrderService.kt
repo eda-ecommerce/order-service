@@ -16,6 +16,7 @@ import org.eda.ecommerce.order.data.models.ShoppingBasket
 import org.eda.ecommerce.order.data.repositories.OrderRepository
 import org.eda.ecommerce.order.exceptions.EventProcessingException
 import org.eda.ecommerce.order.exceptions.InvalidShoppingBasketException
+import org.eda.ecommerce.order.exceptions.OrderCancelledException
 import org.eda.ecommerce.order.exceptions.OrderNotFoundException
 import java.util.*
 
@@ -93,12 +94,17 @@ class OrderService {
     }
 
     @Transactional
-    fun confirmOrder(orderId: UUID): Order {
+    fun confirmOrder(orderId: UUID) {
         val order = orderRepository.findById(orderId)
 
         if (order == null) {
             println("Order $orderId not found")
             throw OrderNotFoundException(orderId, "Cannot confirm non-existing order")
+        }
+
+        if (order.orderStatus == OrderStatus.Canceled) {
+            println("Order $orderId has been canceled and cannot be confirmed")
+            throw OrderCancelledException(orderId, "Cannot confirm canceled order")
         }
 
         order.orderStatus = OrderStatus.Confirmed
@@ -107,8 +113,6 @@ class OrderService {
         orderRepository.persist(order)
 
         orderEmitter.sendMessageAndAwait(OrderConfirmedKafkaMessage(order))
-
-        return order
     }
 
     @Transactional
