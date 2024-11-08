@@ -40,7 +40,7 @@ class StockService {
             val stockEntry = stockRepository.findById(it.productId)
                 ?: throw NoStockRecordsForProductFoundException(it.productId)
 
-            if (stockEntry.availableStock < it.quantity!!) {
+            if (!stockEntry.isAvailableToOrder(it.quantity!!)) {
                 throw NotEnoughStockException(it.productId)
             }
         }
