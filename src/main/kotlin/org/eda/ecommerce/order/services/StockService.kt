@@ -20,18 +20,17 @@ class StockService {
     fun adjustStock(productId: UUID, availableStock: Int) {
         println("Adjusting stock for product $productId to $availableStock")
 
-        val stockEntry = stockRepository.findById(productId)
+        var stockEntry = stockRepository.findById(productId)
 
         if (stockEntry == null) {
             println("No stock entry found for product $productId. Creating new entry.")
-            val newStockEntry = StockEntry()
-            newStockEntry.productId = productId
-            newStockEntry.availableStock = availableStock
-            stockRepository.persist(newStockEntry)
-            return
+            stockEntry = StockEntry().apply {
+                this.productId = productId
+            }
         }
 
         stockEntry.availableStock = availableStock
+
         stockRepository.persist(stockEntry)
     }
 
