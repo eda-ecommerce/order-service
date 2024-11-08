@@ -12,6 +12,8 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.eda.ecommerce.order.data.models.Order
+import org.eda.ecommerce.order.exceptions.OrderCancelledException
+import org.eda.ecommerce.order.exceptions.OrderNotFoundException
 import org.eda.ecommerce.order.services.OrderService
 import java.net.URI
 import java.util.UUID
@@ -111,7 +113,7 @@ class OrderController {
             description = "Order canceled",
         ),
         APIResponse(
-            responseCode = "500",
+            responseCode = "404",
             description = "Order could not be canceled",
         )
     )
@@ -124,8 +126,12 @@ class OrderController {
         )
         id: UUID
     ): Response {
-        val order = orderService.cancelOrder(id)
+        try {
+            orderService.cancelOrder(id)
+        } catch (e: OrderNotFoundException) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e).build()
+        }
 
-        return Response.ok(URI.create("/order/" + order.id)).build()
+        return Response.ok(URI.create("/order/$id")).build()
     }
 }

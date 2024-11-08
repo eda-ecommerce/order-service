@@ -98,7 +98,7 @@ class OrderSystemTest {
             .contentType("application/json")
             .`when`().post("/order/${UUID.randomUUID()}/confirm")
             .then()
-            .statusCode(500)
+            .statusCode(404)
     }
 
     @Test
@@ -138,7 +138,7 @@ class OrderSystemTest {
             .contentType("application/json")
             .`when`().post("/order/${UUID.randomUUID()}/cancel")
             .then()
-            .statusCode(500)
+            .statusCode(404)
     }
 
     @Test
