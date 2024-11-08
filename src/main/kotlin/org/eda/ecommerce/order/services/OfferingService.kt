@@ -35,6 +35,9 @@ class OfferingService {
             productId = offering.productId
             status = offering.status
         }
+
+        println("Updated Offering: $entity")
+        offeringRepository.persist(entity)
     }
 
     fun getOfferingIfAvailableForOrder(id: UUID): Offering {
