@@ -21,7 +21,7 @@ class StockEntry : PanacheEntityBase() {
     }
 
     fun isAvailableToOrder(requestedAmount: Int = 0): Boolean {
-        return availableStock > requestedAmount
+        return availableStock >= requestedAmount
     }
 
 }
