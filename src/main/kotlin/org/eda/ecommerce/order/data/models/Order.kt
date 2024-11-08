@@ -1,7 +1,6 @@
 package org.eda.ecommerce.order.data.models
 
 import com.fasterxml.jackson.annotation.JsonValue
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.persistence.*
 import org.hibernate.annotations.GenericGenerator
 import java.util.*

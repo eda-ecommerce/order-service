@@ -1,6 +1,5 @@
 package org.eda.ecommerce.order.data.models
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
