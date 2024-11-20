@@ -16,6 +16,14 @@ class StockService {
     @Inject
     private lateinit var stockRepository: StockRepository
 
+    fun getAll(): List<StockEntry> {
+        return stockRepository.listAll()
+    }
+
+    fun findById(id: UUID): StockEntry? {
+        return stockRepository.findById(id)
+    }
+
     @Transactional
     fun adjustStock(productId: UUID, availableStock: Int) {
         println("Adjusting stock for product $productId to $availableStock")
