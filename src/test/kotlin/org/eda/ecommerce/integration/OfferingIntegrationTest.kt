@@ -67,9 +67,13 @@ class OfferingIntegrationTest {
         val offeringId = UUID.randomUUID()
         val productId = UUID.randomUUID()
 
+        val product : JsonObject = JsonObject()
+            .put("id", productId)
+            .put("status", "active")
+
         val stockAdjustedEvent: JsonObject = JsonObject()
             .put("id", offeringId)
-            .put("productId", productId)
+            .put("product", product)
             .put("quantity", 1)
             .put("status", "active")
 
@@ -108,9 +112,13 @@ class OfferingIntegrationTest {
             Offering.OfferingStatus.ACTIVE
         )
 
+        val product : JsonObject = JsonObject()
+            .put("id", productId)
+            .put("status", "active")
+
         val stockAdjustedEvent: JsonObject = JsonObject()
             .put("id", offeringId)
-            .put("productId", productId)
+            .put("product", product)
             .put("quantity", 2)
             .put("status", "inactive")
 
