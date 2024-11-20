@@ -33,7 +33,7 @@ jobs:
             @semantic-release/git
         env:
           persist-credentials: false
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
 
       - name: Build with Maven
         if: ${{ (github.event_name == 'push') && (steps.semantic-release.outputs.new_release_published == 'true') }}
