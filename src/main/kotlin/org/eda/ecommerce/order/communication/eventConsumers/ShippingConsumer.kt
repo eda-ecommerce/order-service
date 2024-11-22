@@ -17,7 +17,7 @@ class ShippingConsumer {
 
     @Incoming("shipping-in")
     fun consume(record: ConsumerRecord<String, ShipmentDTO>) {
-        val operation = String(record.headers().lastHeader("operation").value())
+        val operation = String(record.headers().lastHeader("operation").value()).lowercase()
         println("Received Shipping event with operation: $operation")
 
 

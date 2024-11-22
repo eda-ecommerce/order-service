@@ -17,7 +17,7 @@ class ShoppingBasketConsumer {
 
     @Incoming("shopping-basket-in")
     fun consume(record: ConsumerRecord<String, ShoppingBasket>) {
-        val operation = String(record.headers().lastHeader("operation").value())
+        val operation = String(record.headers().lastHeader("operation").value()).lowercase()
         println("Received Shopping Basket event with operation: $operation")
 
         val shoppingBasket = record.value() ?: throw EmptyEventPayloadException(
