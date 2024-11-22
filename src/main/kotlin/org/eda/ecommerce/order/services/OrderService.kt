@@ -59,7 +59,13 @@ class OrderService {
             }
 
             val totalQuantity = offering.quantity * item.quantity
-            productQuantities.add(ProductQuantity(offering.productId, totalQuantity))
+            val newProductQuantity = ProductQuantity(offering.productId, totalQuantity)
+            val alreadyExists = productQuantities.find { it.productId == offering.productId }
+            if (alreadyExists != null) {
+                alreadyExists.quantity = alreadyExists.quantity?.plus(totalQuantity)
+            } else {
+                productQuantities.add(newProductQuantity)
+            }
         }
 
         stockService.validateAllProductsHaveEnoughAvailableQuantity(productQuantities)
