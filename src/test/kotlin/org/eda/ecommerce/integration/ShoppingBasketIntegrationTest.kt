@@ -121,7 +121,7 @@ class ShoppingBasketIntegrationTest {
         entityHelper.createStockEntry(productId, expectedProductQuantity)
 
         val productRecord = ProducerRecord<String, String>(
-            "shoppingBasket",
+            "shopping-basket",
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
@@ -195,7 +195,7 @@ class ShoppingBasketIntegrationTest {
         val (shoppingBasketEvent) = checkoutEventFactory.create()
 
         val productRecord = ProducerRecord<String, String>(
-            "shoppingBasket",
+            "shopping-basket",
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
@@ -231,7 +231,7 @@ class ShoppingBasketIntegrationTest {
         val (shoppingBasketEvent) = checkoutEventFactory.create()
 
         val productRecord = ProducerRecord<String, String>(
-            "shoppingBasket",
+            "shopping-basket",
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
@@ -267,7 +267,7 @@ class ShoppingBasketIntegrationTest {
         val (shoppingBasketEvent) = checkoutEventFactory.create()
 
         val productRecord = ProducerRecord<String, String>(
-            "shoppingBasket",
+            "shopping-basket",
             shoppingBasketEvent.encode()
         )
         productRecord.headers()
