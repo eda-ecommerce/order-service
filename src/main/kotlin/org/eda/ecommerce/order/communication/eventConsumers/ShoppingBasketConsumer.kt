@@ -27,6 +27,7 @@ class ShoppingBasketConsumer {
 
         when (ShoppingBasketEventOperation.from(operation)) {
             ShoppingBasketEventOperation.CHECKOUT -> orderService.createOrderFromShoppingBasket(shoppingBasket)
+            ShoppingBasketEventOperation.UNKNOWN -> println("shopping basket event operation: $operation not implemented, skipping")
         }
     }
 }

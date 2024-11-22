@@ -28,6 +28,7 @@ class ShippingConsumer {
 
         when (ShippingEventOperation.from(operation)) {
             ShippingEventOperation.DELIVERED -> orderService.handleDeliveryById(shipping.orderId)
+            ShippingEventOperation.UNKNOWN -> println("shipping event operation: $operation not implemented, skipping")
         }
     }
 }
